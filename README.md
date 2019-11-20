@@ -16,6 +16,7 @@ The default SLI used in the sample will query 5 different metrics from a Dynatra
 ```
 
 Our sample will create a keptn service called "sampleservice" and assumes there is one stage called "hardening". These names are also used to execute the queries shown above. So - the only thing we have to do for our sample to work is to put a tag on a Dynatrace monitored service with the name "sampleservice-hardening" as shown below. For the sake of this example you can put this tag on any of your monitored services but make sure it has traffic so that we actually get some data:
+
 ![](sample/images/sampleservice-tags-dynatrace.png)
 
 Keptn evaluates these SLOs on demand (via CLI or API):
@@ -35,10 +36,14 @@ I've also used Google's Cloud Shell to execute all installation scripts.
 If you dont use Google Cloud Shell you need a linux shell with installed **kubectl**, **git**
 
 ## 3. Git Repo
-Keptn installs own Git. In order to modify SLIs & SLOs that are managed by keptn we will define a remote git upstream. Feel free to use GitHub, GitLab, Bitbucket or any other Git service. What you need are these 3 things
+Keptn installs its own Git. In order to modify SLIs & SLOs that are managed by keptn we will define a remote git upstream. Feel free to use GitHub, GitLab, Bitbucket or any other Git service. What you need are these 3 things
 1: **GIT_REMOTE_URL**: Create a Remote Git Hub Repo that includes a Readme.md
 2: **GIT_USER**: Your git user to login
 3: **GIT_TOKEN**: A token for your git that allows keptn to push updates to that repo
+
+In my case I simply create a GitHub repo like this:
+
+![](sample/images/github-repo-create.png)
 
 ## 4. Dynatrace Token
 This example shows keptn quality gates based on Dynatrace metrics. Hence you need Dynatrace that instruments the services you want to validate SLOs against. In order for keptn to automate that validation we need two things
@@ -48,8 +53,12 @@ This example shows keptn quality gates based on Dynatrace metrics. Hence you nee
 # 1. Installation of Keptn Quality Gates
 
 ## 1.1 Install Keptn Quality Gates on GKE
+
+Open your Linux shell where you are connected to your GKE cluster. You can validate it by executing kubectl get nodes (but I guess you knew that already) :-)
+In that same shell lets start by cloning this repo and install keptn as shown below:
 ```
-git clone
+git clone https://github.com/grabnerandi/keptn-qualitygate-examples
+cd keptn-qualitygate-examples
 cd common
 installKeptnQualityGates.sh
 exposeBridge.sh
