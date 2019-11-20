@@ -37,18 +37,18 @@ If you dont use Google Cloud Shell you need a linux shell with installed **kubec
 
 ## 3. Git Repo
 Keptn installs its own Git. In order to modify SLIs & SLOs that are managed by keptn we will define a remote git upstream. Feel free to use GitHub, GitLab, Bitbucket or any other Git service. What you need are these 3 things
-1: **GIT_REMOTE_URL**: Create a Remote Git Hub Repo that includes a Readme.md
-2: **GIT_USER**: Your git user to login
-3: **GIT_TOKEN**: A token for your git that allows keptn to push updates to that repo
+1. **GIT_REMOTE_URL**: Create a Remote Git Hub Repo that includes a Readme.md
+2. **GIT_USER**: Your git user to login
+3. **GIT_TOKEN**: A token for your git that allows keptn to push updates to that repo
 
 In my case I simply create a GitHub repo like this:
 
 ![](sample/images/github-repo-create.png)
 
 ## 4. Dynatrace Token
-This example shows keptn quality gates based on Dynatrace metrics. Hence you need Dynatrace that instruments the services you want to validate SLOs against. In order for keptn to automate that validation we need two things
-1: **Dynatrace URL**: Thats e.g: https://abc12345.dynatrace.live.com (for SaaS) or your https://managedservice/e/yourenvioronment (for Managed)
-2: **Dynatrace API Token**: Please create a Dytrace API token with access to timeseries as well as read & write configuration (for my advanced service metric SLIs)
+This example shows keptn quality gates based on Dynatrace metrics. Hence you need Dynatrace that instruments the services you want to validate SLOs against. In order for keptn to automate that validation we need two things:
+1. **Dynatrace URL**: Thats e.g: https://abc12345.dynatrace.live.com (for SaaS) or your https://managedservice/e/yourenvioronment (for Managed)
+2. **Dynatrace API Token**: Please create a Dytrace API token with access to timeseries as well as read & write configuration (for my advanced service metric SLIs)
 
 # 1. Installation of Keptn Quality Gates
 
