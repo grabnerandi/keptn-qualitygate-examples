@@ -1,0 +1,14 @@
+# add using kubectl apply -f custom_metrics_global.yaml
+
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: dynatrace-sli-config-sample
+  namespace: keptn
+data:
+  custom-queries: |
+    throughput: "builtin:service.requestCount.total:merge(0):count?scope=tag(IncludeInQualityGate)"
+    error_rate: "builtin:service.errors.total.count:merge(0):avg?scope=tag(IncludeInQualityGate)"
+    response_time_p50: "builtin:service.response.time:merge(0):percentile(50)?scope=tag(IncludeInQualityGate)"
+    response_time_p90: "builtin:service.response.time:merge(0):percentile(90)?scope=tag(IncludeInQualityGate)"
+    response_time_p95: "builtin:service.response.time:merge(0):percentile(95)?scope=tag(IncludeInQualityGate)"

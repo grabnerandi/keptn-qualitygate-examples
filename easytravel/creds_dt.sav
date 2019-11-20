@@ -1,0 +1,4 @@
+{
+    "dynatraceTenant": "DYNATRACE_TENANT_PLACEHOLDER",
+    "dynatraceApiToken": "DYNATRACE_API_TOKEN"
+}
