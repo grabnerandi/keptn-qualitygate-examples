@@ -15,6 +15,9 @@ setupDynatraceSLIService.sh
 keptn create project sample --shipyard=./shipyard.yaml --git-user=GIT_USER --git-token=GIT_TOKEN --git-remote-url=GIT_REMOTE_URL
 keptn create service sampleservice --project=sample
 
+# Enable Dynatrace SLI for Project
+kubectl apply -f lighthouse_source_dynatrace.yaml
+
 # add our SLOs & SLIs
 kubectl apply -f sample_dynatrace_sli.yaml
 keptn add-resource --project=sample --service=sampleservice --stage=hardening --resource=sample_slo.yaml --resourceUri=slo.yaml
