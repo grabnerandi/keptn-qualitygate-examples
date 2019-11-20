@@ -1,7 +1,7 @@
 #!/bin/bash
 
-DT_TENANT=$(cat creds_dt.json | jq -r '.dynatraceTenant')
-DT_API_TOKEN=$(cat creds_dt.json | jq -r '.dynatraceApiToken')
+DT_TENANT=$(cat ../common/creds_dt.json | jq -r '.dynatraceTenant')
+DT_API_TOKEN=$(cat ../common/creds_dt.json | jq -r '.dynatraceApiToken')
 TAG_CONTEXT=CONTEXTLESS
 TAG_KEY=keptn_project
 TAG_VALUE=simpleproject
