@@ -16,7 +16,7 @@ keptn create project sample --shipyard=./shipyard.yaml --git-user=GIT_USER --git
 keptn create service sampleservice --project=sample
 
 # Enable Dynatrace SLI for Project
-kubectl apply -f lighthouse_source_dynatrace.yaml
+enableDynatraceSLIForProject.sh
 
 # add our SLOs & SLIs
 kubectl apply -f sample_dynatrace_sli.yaml
@@ -26,7 +26,7 @@ keptn add-resource --project=sample --service=sampleservice --stage=hardening --
 keptn send event start-evaluation --project=sample --service=sampleservice --stage=hardening --timeframe=5m --start=2019-11-20T11:00:00
 
 # Wait for Quality Gate Result
-keptn get event evaluation-done --keptn-context=c628051d-0d20-4024-814a-684e8ee7393f
+keptn get event evaluation-done --keptn-context=CONTEXT_RETURNED_BY_START_EVALUATION
 
 # Expose Keptns Bridge via http://localhost:9000
 kubectl port-forward svc/bridge -n keptn 9000:8080
