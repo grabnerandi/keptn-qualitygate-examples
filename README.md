@@ -65,6 +65,11 @@ exposeBridge.sh
 ```
 Validate Keptn install is done and successful by looking at the console output. exposeBridge.sh will expose the keptns bridge under a URL with the format https://bridge.keptn.1.2.3.4.xip.io. You can also validate whether you can access the API endpoint via https://api.keptn.1.2.3.4.xip.io/swagger-ui 
 
+It also installed the keptn CLI in your home directory. So - you should be able to do this to see the info screen
+```
+~/keptn
+```
+
 ## 1.2 Install Dynatrace SLI Service
 Keptn has a central service called Lighthouse services which does all the pulling of data from different data providers (SLI providers), stores the data in the backend mongodb and also does the SLO validation based on the SLO definition. The first thing we need to do is to install the Dynatrace SLI data provider which is one of the providers currently supported!
 ```
