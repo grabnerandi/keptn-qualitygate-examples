@@ -8,7 +8,7 @@ echo "============================================================="
 read -rsp $'Press ctrl-c to abort. Press any key to continue...\n' -n1 key
 echo ""
 
-DOMAIN=$(kubectl get cm -n keptn keptn-domain -oyaml | yq - r data.app_domain)
+DOMAIN=$(kubectl get cm keptn-domain -n keptn -ojsonpath={.data.app_domain})
 
 rm -f ./manifests/gen/bridgeIngress.yaml
 cat ./manifests/bridgeIngress.yaml | \
