@@ -1,0 +1,28 @@
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: nginx
+  name: bridge-ingress
+  namespace: keptn
+spec:
+  tls:
+    - hosts:
+        - DOMAIN_PLACEHOLDER
+      secretName: sslcerts
+  rules:
+    - host: bridge.keptn.DOMAIN_PLACEHOLDER
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: bridge
+              servicePort: 8080
+    - host: bridge.keptn
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: bridge
+              servicePort: 8080
