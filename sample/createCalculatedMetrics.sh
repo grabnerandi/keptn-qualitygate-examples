@@ -12,6 +12,7 @@ TAG_VALUE=$3
 echo "============================================================="
 echo "About to create 3 service metrics with condition [$1]$2:$3 on Dynatrace Tenant: $DT_TENANT!"
 echo "============================================================="
+echo "Usage: ./createCalculatedMetric TAG_CONTEXT TAG_KEY TAG_VALUE"
 read -rsp $'Press ctrl-c to abort. Press any key to continue...\n' -n1 key
 
 ####################################################################################################################
@@ -29,17 +30,12 @@ function createCalculatedMetric() {
     DIMENSION_NAME=$7
     DIMENSION_DEFINTION=$8
 
-    curl -X PUT \
-        "https://$DT_TENANT/api/config/v1/customMetric/service/$METRICKEY" \
-        -H 'accept: application/json; charset=utf-8' \
-        -H "Authorization: Api-Token $DT_API_TOKEN" \
-        -H 'Content-Type: application/json; charset=utf-8' \
-        -d '{
-            "tsmMetricKey": "$METRICKEY",
-            "name": "$METRICNAME",
+    PAYLOAD = '{
+            "tsmMetricKey": "'$METRICKEY'",
+            "name": "'$METRICNAME'",
             "enabled": true,
             "metricDefinition": {
-                "metric": "$BASEMETRIC",
+                "metric": "'$BASEMETRIC'",
                 "requestAttribute": null
             },
             "unit": "MICRO_SECOND",
@@ -60,14 +56,23 @@ function createCalculatedMetric() {
                 }
             ],
             "dimensionDefinition": {
-                "name": "$DIMENSION_NAME",
-                "dimension": "$DIMENSION_DEFINTION",
+                "name": "'$DIMENSION_NAME'",
+                "dimension": "'$DIMENSION_DEFINTION'",
                 "placeholders": [],
                 "topX": 10,
                 "topXDirection": "DESCENDING",
                 "topXAggregation": "SUM"
             }
-        }' \
+        }'
+
+    echo $PAYLOAD
+
+    curl -X PUT \
+        "https://$DT_TENANT/api/config/v1/customMetric/service/$METRICKEY" \
+        -H 'accept: application/json; charset=utf-8' \
+        -H "Authorization: Api-Token $DT_API_TOKEN" \
+        -H 'Content-Type: application/json; charset=utf-8' \
+        -d $PAYLOAD \
         -o curloutput.txt
 }
 
