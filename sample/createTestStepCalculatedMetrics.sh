@@ -1,12 +1,18 @@
 #!/bin/bash
 
+# Usage:
+# ./createTestStepCalculatedMetrics.sh CONTEXTLESS sampleservice-hardening
+
 DT_TENANT=$(cat ../common/creds_dt.json | jq -r '.dynatraceTenant')
 DT_API_TOKEN=$(cat ../common/creds_dt.json | jq -r '.dynatraceApiToken')
+CONDITION_CONTEXT=$1
+CONDITION_KEY=$2
+CONDITION_VALUE=$3
 
 echo "============================================================="
-echo "About to create 1 service metrics for Test Integrations on Dynatrace Tenant: $DT_TENANT!"
+echo "About to create 1 service metrics for Test Integrations [$1]$2:$3 on Dynatrace Tenant: $DT_TENANT!"
 echo "============================================================="
-echo "Usage: ./createTestStepCalculatedMetrics "
+echo "Usage: ./createTestStepCalculatedMetrics CONTEXT KEY VALUE"
 read -rsp $'Press ctrl-c to abort. Press any key to continue...\n' -n1 key
 
 METRICKEY="calc:service.teststepresponsetime"
@@ -31,6 +37,19 @@ PAYLOAD='{
                 "negate": false,
                 "requestAttribute": "TSN",
                 "caseSensitive": false
+            }
+        },
+        {
+            "attribute": "SERVICE_TAG",
+            "comparisonInfo": {
+                "type": "TAG",
+                "comparison": "EQUALS",
+                "value": {
+                    "context": "'$CONDITION_CONTEXT'",
+                    "key": "'$CONDITION_KEY'",
+                    "value": "'$CONDITION_VALUE'"
+                },
+                "negate": false
             }
         }
     ],
