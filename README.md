@@ -1,4 +1,6 @@
-# Setting up Sample Keptn Quality Gate Project for Services monitored with Dynatrace
+# Setting up Sample Keptn 0.6beta Quality Gate Project for Services monitored with Dynatrace
+
+**Disclaimer:** this is for keptn 0.6.beta quality gates only use case
 
 This example walks you through 
 1. Installing keptn for the capabilty **Quality Gates only** on GKE
