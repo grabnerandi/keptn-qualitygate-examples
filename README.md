@@ -1,7 +1,7 @@
 # Setting up Sample Keptn Quality Gate Project for Services monitored with Dynatrace
 
 This example walks you through 
-1. Installing keptn for the capabilty Quality Gates on GKE
+1. Installing keptn for the capabilty **Quality Gates only** on GKE
 2. Defining SLIs (Service Level Indicators) and SLOs (Service Level Objects) for metrics from Dynatrace
 3. Having keptn evaluate these SLOs when calling the Keptn CLI or the Keptn CLI for a specific timeframe
 
@@ -13,6 +13,13 @@ The default SLI used in the sample will query 5 different metrics from a Dynatra
     response_time_p50: "builtin:service.response.time:merge(0):percentile(50)?scope=tag($SERVICE-$STAGE)"
     response_time_p90: "builtin:service.response.time:merge(0):percentile(90)?scope=tag($SERVICE-$STAGE)"
     response_time_p95: "builtin:service.response.time:merge(0):percentile(95)?scope=tag($SERVICE-$STAGE)"
+```
+
+Later in the tutorial we are adding some custom service metrics to this list such as
+```
+    rt_invoke_avg: "calc:service.topurlresponsetime:filter(eq(URL,/api/invoke)):merge(0):(avg)?scope=tag($SERVICE-$STAGE)"
+    count_svccalls_invoke: "calc:service.topurlservicecalls:filter(eq(URL,/api/invoke)):merge(0):(sum)?scope=tag($SERVICE-$STAGE)"
+    count_dbcalls_invoke: "calc:service.topurldbcalls:filter(eq(URL,/api/invoke)):merge(0):(avg)?scope=tag($SERVICE-$STAGE)"
 ```
 
 Our sample will create a keptn service called "sampleservice" and assumes there is one stage called "hardening". These names are also used to execute the queries shown above. So - the only thing we have to do for our sample to work is to put a tag on a Dynatrace monitored service with the name "sampleservice-hardening" as shown below. For the sake of this example you can put this tag on any of your monitored services but make sure it has traffic so that we actually get some data:
@@ -46,7 +53,8 @@ In my case I simply create a GitHub repo like this:
 ![](sample/images/github-repo-create.png)
 
 ## 4. Dynatrace Token
-This example shows keptn quality gates based on Dynatrace metrics. Hence you need Dynatrace that instruments the services you want to validate SLOs against. In order for keptn to automate that validation we need two things:
+This example shows keptn quality gates based on Dynatrace metrics using the new [Dynatrace Metrics v2 API](https://www.dynatrace.com/support/help/extend-dynatrace/dynatrace-api/environment-api/metric/).
+Hence you need Dynatrace that instruments the services you want to validate SLOs against. In order for keptn to automate that validation we need two things:
 1. **Dynatrace URL**: Thats e.g: https://abc12345.dynatrace.live.com (for SaaS) or your https://managedservice/e/yourenvioronment (for Managed)
 2. **Dynatrace API Token**: Please create a Dytrace API token with access to timeseries as well as read & write configuration (for my advanced service metric SLIs)
 
@@ -154,10 +162,29 @@ Here are some additional examples for start-evaluation
 
 # 4. Understanding and extending SLIs
 
-Dynatrace's Metrics API provides powerful query options. Besides specifying the metric you want you can define use the scope option to filter on tags, management zones, entities, dimensions ...
+Dynatrace's [Metrics APIv2](https://www.dynatrace.com/support/help/extend-dynatrace/dynatrace-api/environment-api/metric/selector-transformations/) provides powerful query options. Besides specifying the metric you want you can define use the scope option to filter on tags, management zones, entities, dimensions ...
 When keptn executes these queries you can use a bunch of placeholders that keptn passes to the SLI services. More details can be found in the [Dynatrace SLI documentation](https://github.com/keptn-contrib/dynatrace-sli-service/tree/release-0.1.0). If you have tagged your services with project, service or stage you can use these placeholders like shown on that doc page, e.g:
 ```
 scope=tag(keptn_project:$PROJECT),tag(keptn_stage:$STAGE),tag(keptn_service:$SERVICE),tag(keptn_deployment:canary)
 ```
 
-# 4.1 Adding a Calculated Service Metric
+As of **keptn 0.6.beta** the SLIs have to either be specified globally for the whole keptn Dynatrace SLI installation or you can define them per keptn project. In both cases the SLI definitions are stored as ConfigMap in k8s. This will change with the final release so SLIs can also be specified in Git which makes it much easier to modify.
+
+# 4.1 Adding a Calculated Service Metric for Response Time & Database Activity split by URL
+
+One of the key requirements from users on quality gates was to not just define SLOs on overall Response Time of a service but rather define different SLOs for the different URL endpoints, e.g: /api/login, /api/logout, /api/somethingelse like I can see them in the Service Details views
+![](sample/images/dnatrace-top-requests-view.png)
+
+In order to have these values available as metrics we can leverage a new capability that is currently (as of November 2019) [available for preview](https://www.dynatrace.com/news/blog/custom-metrics-for-services-enrich-dynatrace-ai-and-dashboarding-capabilities-eap/). It allows us to have Dynatrace create new metrics based on distributed tracing (PurePath) data, e.g: Response Time split by URL, Time in Database split by URL, Response Time split by Test Name (this works well for automated testing)
+While we can create these metrics through the Dynatrace UI as described in the [blog from Michael Kopp](https://www.dynatrace.com/news/blog/custom-metrics-for-services-enrich-dynatrace-ai-and-dashboarding-capabilities-eap/) we can also create these metrics through the REST API. I have prepared a script that will create 3 Metrics for us
+1. Top URL Response Time (calc:service.topurlresponsetime)
+2. Top URL Service Calls (calc:service.topurlservicecalls)
+3. Top URL DB Calls (calc:service.topurldbcalls)
+
+Metrics are not calculated for every distributed trace but only those that meet a certain condition, e.g: only those on a particular service. In my sample I decided to use our service tag as the condition which is why we have to call our script with the information about our tag:
+```
+./createCalculatedMetrics.sh CONTEXTLESS sampleservice-hardening
+```
+
+After this script runs you should see three service metric definitions in dynatrace. Go to Settings -> server-side monitoring -> Service Metrics
+

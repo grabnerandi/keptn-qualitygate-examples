@@ -1,4 +1,4 @@
-# add using kubectl apply -f custom_metrics_global.yaml
+# add using kubectl apply -f sample_dynatrace_sli.yaml
 
 kind: ConfigMap
 apiVersion: v1

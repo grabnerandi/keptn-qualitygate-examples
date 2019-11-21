@@ -1,6 +1,5 @@
 #!/bin/bash
 
-clear
 echo ""
 echo "============================================================="
 echo "About to create an Ingress for the Keptn Bridge service"
