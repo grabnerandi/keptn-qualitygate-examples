@@ -31,11 +31,11 @@ function createCalculatedMetric() {
     DIMENSION_DEFINTION=$8
 
     PAYLOAD = '{
-            "tsmMetricKey": "$METRICKEY",
-            "name": "$METRICNAME",
+            "tsmMetricKey": "'$METRICKEY'",
+            "name": "'$METRICNAME'",
             "enabled": true,
             "metricDefinition": {
-                "metric": "$BASEMETRIC",
+                "metric": "'$BASEMETRIC'",
                 "requestAttribute": null
             },
             "unit": "MICRO_SECOND",
@@ -47,17 +47,17 @@ function createCalculatedMetric() {
                     "type": "TAG",
                     "comparison": "EQUALS",
                     "value": {
-                        "context": "$CONDITION_CONTEXT",
-                        "key": "$CONDITION_KEY",
-                        "value": "$CONDITION_VALUE"
+                        "context": "'$CONDITION_CONTEXT'",
+                        "key": "'$CONDITION_KEY'",
+                        "value": "'$CONDITION_VALUE'"
                     },
                     "negate": false
                 }
                 }
             ],
             "dimensionDefinition": {
-                "name": "$DIMENSION_NAME",
-                "dimension": "$DIMENSION_DEFINTION",
+                "name": "'$DIMENSION_NAME'",
+                "dimension": "'$DIMENSION_DEFINTION'",
                 "placeholders": [],
                 "topX": 10,
                 "topXDirection": "DESCENDING",
