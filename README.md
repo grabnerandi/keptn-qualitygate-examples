@@ -60,21 +60,26 @@ In that same shell lets start by cloning this repo and install keptn as shown be
 git clone https://github.com/grabnerandi/keptn-qualitygate-examples
 cd keptn-qualitygate-examples
 cd common
-installKeptnQualityGates.sh
-exposeBridge.sh
+./installKeptnQualityGates.sh
+./exposeBridge.sh
 ```
-Validate Keptn install is done and successful by looking at the console output. exposeBridge.sh will expose the keptns bridge under a URL with the format https://bridge.keptn.1.2.3.4.xip.io. You can also validate whether you can access the API endpoint via https://api.keptn.1.2.3.4.xip.io/swagger-ui 
+Validate Keptn install is done and successful by looking at the console output. exposeBridge.sh will expose the keptns bridge under a URL with the format https://bridge.keptn.1.2.3.4.xip.io. Should look like this:
+![](sample/images/keptn-bridge-after-install.png)
 
-It also installed the keptn CLI in your home directory. So - you should be able to do this to see the info screen
+You can also validate whether you can access the API endpoint via https://api.keptn.1.2.3.4.xip.io/swagger-ui
+![](sample/images/swagger-ui.png)
+
+You now also have the keptn CLI installed with is already authenticated against your keptn installation. You can run e.g: keptn or keptn status 
 ```
 ~/keptn
+~/keptn status
 ```
 
 ## 1.2 Install Dynatrace SLI Service
 Keptn has a central service called Lighthouse services which does all the pulling of data from different data providers (SLI providers), stores the data in the backend mongodb and also does the SLO validation based on the SLO definition. The first thing we need to do is to install the Dynatrace SLI data provider which is one of the providers currently supported!
 ```
-defineDynatraceCredentials.sh
-setupDynatraceSLIService.sh
+./defineDynatraceCredentials.sh
+./setupDynatraceSLIService.sh
 ```
 
 # 2. Setup keptn project & service with SLIs & SLOs
@@ -84,10 +89,12 @@ I decided to keep it simple!
 We create a project with the name *sample* and it will have a service with the name *sampleservice*. The *shipyard* file defines a single stage with the name *hardening*!
 Make sure you have your GIT_USER, GIT_TOKEN and GIT_REMOTE_URL ready!
 ```
-cd sample
-keptn create project sample --shipyard=./shipyard.yaml --git-user=GIT_USER --git-token=GIT_TOKEN --git-remote-url=GIT_REMOTE_URL
-keptn create service sampleservice --project=sample
+cd ../sample
+~/keptn create project sample --shipyard=./shipyard.yaml --git-user=GIT_USER --git-token=GIT_TOKEN --git-remote-url=GIT_REMOTE_URL
+~/keptn create service sampleservice --project=sample
 ```
+If you open your git repository you should already see content in the master and content in the hardening branch as keptn automatically creates branches for each stage.
+![](sample/images/github-after-createproject.png)
 
 ## 2.2 Enable Dynatrace SLI for Project
 While we have installed the Dynatrace SLI Data Source for keptn we have to enable and configure it for each project. 
@@ -97,7 +104,8 @@ The enableDynatraceSLIForProjects.sh actually does two things:
 
 Ready? lets set it up for the sample project
 ```
-enableDynatraceSLIForProject.sh sample
+cd ../common
+./enableDynatraceSLIForProject.sh sample
 ```
 
 ## 2.3 Adding our SLOs & SLIs
@@ -106,8 +114,9 @@ enableDynatraceSLIForProject.sh sample
 SLOs are already stored in Git for a specific project and stage. In our case we upload the sample_slo.yaml to our sampleservice in our sample project for the hardening stage! Check out the yaml file. You will see that I kept it simply. One SLI actually has conditions specified, the other ones are just "informational" which means the Quality Gate will pull the data but currently wont include it for the overall scoring. This has been a feature requested by many as you dont necessarily know from the start what your SLOs are for each indictor!
 
 ```
+cd ../sample
 kubectl apply -f sample_dynatrace_sli.yaml
-keptn add-resource --project=sample --service=sampleservice --stage=hardening --resource=sample_slo.yaml --resourceUri=slo.yaml
+~/keptn add-resource --project=sample --service=sampleservice --stage=hardening --resource=sample_slo.yaml --resourceUri=slo.yaml
 ```
 
 You should see the slo.yaml file also in your own git repo that you have configured during the keptn create project step. You should see that repo having a master and a hardening branch and you will find the slo.yaml in the folder for the sampleservice. If you want to make any modifications to the slo.yaml you can now also just make it there!
@@ -117,7 +126,7 @@ You should see the slo.yaml file also in your own git repo that you have configu
 ## 3.1 Execute a Quality Gate Evaluation
 Our project is ready and we can now start triggering evaluations of our SLOs. We can do this via keptn send event start-evaluation and passing it the project, service, stage and timeframe we want to be analyzed.
 ```
-keptn send event start-evaluation --project=sample --service=sampleservice --stage=hardening --timeframe=5m --start=2019-11-20T11:00:00
+~/keptn send event start-evaluation --project=sample --service=sampleservice --stage=hardening --timeframe=5m --start=2019-11-20T11:00:00
 ```
 This command will kick off the evaluation. Evaluations can be done in seconds but may also take a while as every SLI provider needs to query each SLIs first. This is why the keptn cli will return the keptn context which is basically a token we can use to poll the status of this particular evaluation. The output of the previous command looks like this:
 ```
@@ -128,16 +137,19 @@ ID of Keptn context: 6cd3e469-cbd3-4f73-92c3-8b2fb341bb11
 ## 3.2 Getting the Quality Gate Result
 With the keptn context for our evaluation we can ask keptn about the evaluation-done which is sent by keptn's lighthouse service once all SLI providers have returned their data and keptn could evaluate all SLOs. To do this we can use - obviously you have to use your keptn-context
 ```
-keptn get event evaluation-done --keptn-context=6cd3e469-cbd3-4f73-92c3-8b2fb341bb11
+~/keptn get event evaluation-done --keptn-context=YOUR-KEPTN-CONTEXT-FROM-EVALUATION-START
 ```
+![](sample/images/keptn-cli-evaluation-done-result.png)
+
 Another way to look at the data is through the keptn bridge where we also get a nice UI visualization of every SLI!
+![](sample/images/keptn-bridge-evaluation-done.png)
 
 ## 3.3 Additional Evaluation Options
 Here are some additional examples for start-evaluation
 
 **Example #1:** Evaluate the last hour by omitting start timeframe and just specifying timeframe
 ```
-keptn send event start-evaluation --project=sample --service=sampleservice --stage=hardening --timeframe=1h
+~/keptn send event start-evaluation --project=sample --service=sampleservice --stage=hardening --timeframe=1h
 ```
 
 # 4. Understanding and extending SLIs
@@ -148,4 +160,4 @@ When keptn executes these queries you can use a bunch of placeholders that keptn
 scope=tag(keptn_project:$PROJECT),tag(keptn_stage:$STAGE),tag(keptn_service:$SERVICE),tag(keptn_deployment:canary)
 ```
 
-# 4.1 
+# 4.1 Adding a Calculated Service Metric
