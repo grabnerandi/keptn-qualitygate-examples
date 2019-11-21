@@ -222,9 +222,63 @@ With the updated SLI and SLO in place we can run another evaluation run just as 
 ~/keptn send event start-evaluation --project=sample --service=sampleservice --stage=hardening --timeframe=10m --start=2019-11-21T11:00:00
 ```
 
-And then wait for the result via the CLI or just opening up the keptns Bridge
+And then wait for the result via the CLI or just opening up the keptns Bridge:
+![](sample/keptn-bridge-evaluation-done-extended.png)
 
 # 5 Interacting with Keptn via the API
 
+Keptn provides a REST API and a Swagger UI to easily interact with the API. What you need is the Keptn Token which you can get through this command:
+```
+KEPTN_API_TOKEN=$(kubectl get secret keptn-api-token -n keptn -ojsonpath={.data.keptn-api-token} | base64 --decode)
+echo $KEPTN_API_TOKEN
+```
+If you dont remember the API endpoint then simply execute
+```
+~/keptn status
+```
+
+It will tell you the API Endpoint. To access the Swagger UI simply add /swagger-ui to that URL!
+
 ## 5.1 Sending Start Evaluation Events
 
+Here is an example on how to execute a Start Evaluation Event (type=s.keptn.event.start-evaluation). 
+There are only a couple of items you need to pass in the data section:
+* start: defines the start timestamp of the evaluation timeframe
+* end: end timestamp of the evaluation timeframe
+* project, service, stage: this is your keptn project, service and stage
+* teststrategy: this one has to be "manual" right now
+```
+{
+  "data": {
+    "start": "2019-11-21T11:00:00.000Z",
+    "end": "2019-11-21T11:10:00.000Z",
+    "project": "sample",
+    "service": "sampleservice",
+    "stage": "hardening",
+    "teststrategy": "manual"
+  },
+  "type": "sh.keptn.event.start-evaluation"
+}
+```
+
+And here is the corresponding curl where you can see how send a POST to the /event endpoint. The keptn token gets passed via the x-token header!
+```
+curl -X POST "http://api.keptn.12.34.56.78.xip.io/v1/event" -H "accept: application/json" -H "x-token: YOUR_KEPTN_TOKEN" -H "Content-Type: application/json" -d "{ \"data\": { \"end\": \"2019-11-21T11:10:00.000Z\", \"project\": \"sample\", \"service\": \"sampleservice\", \"stage\": \"hardening\", \"start\": \"2019-11-21T11:00:00.000Z\", \"teststrategy\": \"manual\" }, \"type\": \"sh.keptn.event.start-evaluation\"}"
+```
+
+What comes back is the keptn context that was created for you, here an example
+```
+{"keptnContext":"384dae76-2d31-41e6-9204-39f2c1513906","token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MDU0NDA4ODl9.OdkhIoJ9KuT4bm7imvEXHdEPjnU0pl5S7DqGibNa924"}
+```
+
+## 5.2 Query for Evaluation Done
+
+This is a simple GET request to the /event endpoint. Here is an example for the keptnContext returned in the previous example:
+```
+curl -X GET "http://api.keptn.12.34.56.78.xip.io/v1/event?keptnContext=384dae76-2d31-41e6-9204-39f2c1513906&type=sh.keptn.events.evaluation-done" -H "accept: application/json" -H "x-token: YOUR_KEPTN_TOKEN"
+```
+
+And here the response that comes back in my case:
+```
+{"contenttype":"application/json","data":{"deploymentstrategy":"","evaluationdetails":{"indicatorResults":[{"score":1,"status":"pass","targets":[{"criteria":"\u003c=+10%","targetValue":186.30640506908065,"violated":false},{"criteria":"\u003c600","targetValue":600,"violated":false}],"value":{"metric":"response_time_p95","success":true,"value":169.36945915370967}},{"score":0,"status":"info","targets":null,"value":{"metric":"throughput","success":true,"value":1}},{"score":0,"status":"info","targets":null,"value":{"metric":"error_rate","success":true,"value":0}},{"score":0,"status":"info","targets":null,"value":{"metric":"response_time_p50","success":true,"value":0.6075295178067817}},{"score":0,"status":"info","targets":null,"value":{"metric":"response_time_p90","success":true,"value":168.3322319758899}},{"score":0,"status":"info","targets":null,"value":{"message":"Dynatrace API returned status code 404 - Metric could not be received.","metric":"rt_invoke_avg","success":false,"value":0}},{"score":0,"status":"info","targets":null,"value":{"message":"Dynatrace API returned status code 404 - Metric could not be received.","metric":"count_svccalls_invoke","success":false,"value":0}},{"score":0,"status":"info","targets":null,"value":{"message":"Dynatrace API returned status code 404 - Metric could not be received.","metric":"count_dbcalls_invoke","success":false,"value":0}}],"result":"pass","score":100,"sloFileContent":"Y29tcGFyaXNvbjoKICBhZ2dyZWdhdGVfZnVuY3Rpb246IGF2ZwogIGNvbXBhcmVfd2l0aDogc2luZ2xlX3Jlc3VsdAogIGluY2x1ZGVfcmVzdWx0X3dpdGhfc2NvcmU6IHBhc3MKICBudW1iZXJfb2ZfY29tcGFyaXNvbl9yZXN1bHRzOiAzCmZpbHRlcjogbnVsbApvYmplY3RpdmVzOgotIGtleV9zbGk6IGZhbHNlCiAgcGFzczoKICAtIGNyaXRlcmlhOgogICAgLSA8PSsxMCUKICAgIC0gPDYwMAogIHNsaTogcmVzcG9uc2VfdGltZV9wOTUKICB3YXJuaW5nOgogIC0gY3JpdGVyaWE6CiAgICAtIDw9ODAwCiAgd2VpZ2h0OiAxCi0ga2V5X3NsaTogZmFsc2UKICBwYXNzOiBudWxsCiAgc2xpOiB0aHJvdWdocHV0CiAgd2FybmluZzogbnVsbAogIHdlaWdodDogMQotIGtleV9zbGk6IGZhbHNlCiAgcGFzczogbnVsbAogIHNsaTogZXJyb3JfcmF0ZQogIHdhcm5pbmc6IG51bGwKICB3ZWlnaHQ6IDEKLSBrZXlfc2xpOiBmYWxzZQogIHBhc3M6IG51bGwKICBzbGk6IHJlc3BvbnNlX3RpbWVfcDUwCiAgd2FybmluZzogbnVsbAogIHdlaWdodDogMQotIGtleV9zbGk6IGZhbHNlCiAgcGFzczogbnVsbAogIHNsaTogcmVzcG9uc2VfdGltZV9wOTAKICB3YXJuaW5nOiBudWxsCiAgd2VpZ2h0OiAxCi0ga2V5X3NsaTogZmFsc2UKICBwYXNzOiBudWxsCiAgc2xpOiBydF9pbnZva2VfYXZnCiAgd2FybmluZzogbnVsbAogIHdlaWdodDogMQotIGtleV9zbGk6IGZhbHNlCiAgcGFzczogbnVsbAogIHNsaTogY291bnRfc3ZjY2FsbHNfaW52b2tlCiAgd2FybmluZzogbnVsbAogIHdlaWdodDogMQotIGtleV9zbGk6IGZhbHNlCiAgcGFzczogbnVsbAogIHNsaTogY291bnRfZGJjYWxsc19pbnZva2UKICB3YXJuaW5nOiBudWxsCiAgd2VpZ2h0OiAxCnNwZWNfdmVyc2lvbjogMC4xLjAKdG90YWxfc2NvcmU6CiAgcGFzczogOTAlCiAgd2FybmluZzogNzUlCg==","timeEnd":"2019-11-21T11:10:00.000Z","timeStart":"2019-11-21T11:00:00.000Z"},"project":"sample","result":"pass","service":"sampleservice","stage":"hardening","teststrategy":"manual"},"id":"c6ef3d94-a528-4f3d-85bd-5fe1183dd2c9","source":"lighthouse-service","specversion":"0.2","time":"2019-11-21T11:48:11.130Z","type":"sh.keptn.events.evaluation-done","shkeptncontext":"384dae76-2d31-41e6-9204-39f2c1513906"}
+```
