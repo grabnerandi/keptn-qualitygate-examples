@@ -30,7 +30,7 @@ function createCalculatedMetric() {
     DIMENSION_NAME=$7
     DIMENSION_DEFINTION=$8
 
-    PAYLOAD = '{
+    PAYLOAD='{
             "tsmMetricKey": "'$METRICKEY'",
             "name": "'$METRICNAME'",
             "enabled": true,
@@ -65,6 +65,7 @@ function createCalculatedMetric() {
             }
         }'
 
+    echo "Creating Metric $METRICNAME($METRICKEY)"
     echo "$PAYLOAD"
 
     curl -X PUT \
@@ -81,7 +82,7 @@ function createCalculatedMetric() {
 ## Base Metric: Response Time (RESPONSE_TIME)
 ## Dimension: URL
 ## Condition: service tag [$TAG_CONTEXT]$TAG_KEY:TAG_VALUE
-createCalculatedMetric "calc:service.topurlresponsetime", "Top URL Response Time", "RESPONSE_TIME", "$TAG_CONTEXT", "$TAG_KEY", "$TAG_VALUE", "URL", "{URL:Path}"
+createCalculatedMetric "calc:service.topurlresponsetime" "Top URL Response Time" "RESPONSE_TIME" "$TAG_CONTEXT" "$TAG_KEY" "$TAG_VALUE" "URL" "{URL:Path}"
 
 
 ## Creates a Calculated Service Metrics "Top URL Service Calls"
@@ -89,14 +90,14 @@ createCalculatedMetric "calc:service.topurlresponsetime", "Top URL Response Time
 ## Base Metric: Number of calls to other services (NON_DATABASE_CHILD_CALL_COUNT)
 ## Dimension: URL
 ## Condition: service tag [$TAG_CONTEXT]$TAG_KEY:TAG_VALUE
-createCalculatedMetric "calc:service.topurlservicecalls", "Top URL Service Calls", "NON_DATABASE_CHILD_CALL_COUNT", "$TAG_CONTEXT", "$TAG_KEY", "$TAG_VALUE", "URL", "{URL:Path}"
+createCalculatedMetric "calc:service.topurlservicecalls" "Top URL Service Calls" "NON_DATABASE_CHILD_CALL_COUNT" "$TAG_CONTEXT" "$TAG_KEY" "$TAG_VALUE" "URL" "{URL:Path}"
 
 ## Creates a Calculated Service Metrics "Top URL Service Calls"
 ## Metrics Id: calc:service.topurlservicecalls
 ## Base Metric: Number of calls to other services (NON_DATABASE_CHILD_CALL_COUNT)
 ## Dimension: URL
 ## Condition: service tag [$TAG_CONTEXT]$TAG_KEY:TAG_VALUE
-createCalculatedMetric "calc:service.topurldbcalls", "Top URL DB Calls", "DATABASE_CHILD_CALL_COUNT", "$TAG_CONTEXT", "$TAG_KEY", "$TAG_VALUE", "URL", "{URL:Path}"
+createCalculatedMetric "calc:service.topurldbcalls" "Top URL DB Calls" "DATABASE_CHILD_CALL_COUNT" "$TAG_CONTEXT" "$TAG_KEY" "$TAG_VALUE" "URL" "{URL:Path}"
 
 
 ## Creates a Calculated Service Metrics "Test Step Response Time"
@@ -104,7 +105,7 @@ createCalculatedMetric "calc:service.topurldbcalls", "Top URL DB Calls", "DATABA
 ## Base Metric: Response Time (RESPONSE_TIME)
 ## Dimension: URL
 ## Condition: service tag [$TAG_CONTEXT]$TAG_KEY:TAG_VALUE
-## createCalculatedMetric "calc:service.teststepresponsetime", "Test Step Response Time", "RESPONSE_TIME", "$TAG_CONTEXT", "$TAG_KEY", "$TAG_VALUE", "URL", "{URL}"
+## createCalculatedMetric "calc:service.teststepresponsetime" "Test Step Response Time" "RESPONSE_TIME" "$TAG_CONTEXT" "$TAG_KEY" "$TAG_VALUE" "URL" "{URL}"
 
 
 
