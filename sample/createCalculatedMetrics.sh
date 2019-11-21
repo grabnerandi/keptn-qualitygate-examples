@@ -5,7 +5,7 @@
 
 DT_TENANT=$(cat ../common/creds_dt.json | jq -r '.dynatraceTenant')
 DT_API_TOKEN=$(cat ../common/creds_dt.json | jq -r '.dynatraceApiToken')
-TAG_CONTEXT=$1:
+TAG_CONTEXT=$1
 TAG_KEY=$2
 TAG_VALUE=$3
 
@@ -16,7 +16,7 @@ echo "Usage: ./createCalculatedMetric TAG_CONTEXT TAG_KEY TAG_VALUE"
 read -rsp $'Press ctrl-c to abort. Press any key to continue...\n' -n1 key
 
 ####################################################################################################################
-## createCalculatedMetric(METRICKEY, METRICNAME, BASEMETRIC, CONTEXT, KEY, VALUE, DIMENSIONNAME, DIMENSIONDEF)
+## createCalculatedMetric(METRICKEY, METRICNAME, BASEMETRIC, UNIT, CONTEXT, KEY, VALUE, DIMENSIONNAME, DIMENSIONDEF)
 ####################################################################################################################
 # Example: createCalculatedMetric("calc:service.topurlresponsetime", "Top URL Response Time", "RESPONSE_TIME", "CONTEXTLESS", "keptn_project", "simpleproject", "URL", "{URL}")
 # Full List of possible BASEMETRICS: CPU_TIME, DATABASE_CHILD_CALL_COUNT, DATABASE_CHILD_CALL_TIME, EXCEPTION_COUNT, FAILED_REQUEST_COUNT, FAILED_REQUEST_COUNT_CLIENT, FAILURE_RATE, FAILURE_RATE_CLIENT, HTTP_4XX_ERROR_COUNT, HTTP_4XX_ERROR_COUNT_CLIENT, HTTP_5XX_ERROR_COUNT, HTTP_5XX_ERROR_COUNT_CLIENT, IO_TIME, LOCK_TIME, NON_DATABASE_CHILD_CALL_COUNT, NON_DATABASE_CHILD_CALL_TIME, REQUEST_ATTRIBUTE, REQUEST_COUNT, RESPONSE_TIME, RESPONSE_TIME_CLIENT, SUCCESSFUL_REQUEST_COUNT, SUCCESSFUL_REQUEST_COUNT_CLIENT, TOTAL_PROCESSING_TIME, WAIT_TIME
@@ -24,11 +24,12 @@ function createCalculatedMetric() {
     METRICKEY=$1
     METRICNAME=$2
     BASEMETRIC=$3
-    CONDITION_CONTEXT=$4
-    CONDITION_KEY=$5
-    CONDITION_VALUE=$6
-    DIMENSION_NAME=$7
-    DIMENSION_DEFINTION=$8
+    METRICUNIT=$4
+    CONDITION_CONTEXT=$5
+    CONDITION_KEY=$6
+    CONDITION_VALUE=$7
+    DIMENSION_NAME=$8
+    DIMENSION_DEFINTION=$9
 
     PAYLOAD='{
             "tsmMetricKey": "'$METRICKEY'",
@@ -38,7 +39,7 @@ function createCalculatedMetric() {
                 "metric": "'$BASEMETRIC'",
                 "requestAttribute": null
             },
-            "unit": "MICRO_SECOND",
+            "unit": "'$METRICUNIT'",
             "unitDisplayName": "",
             "conditions": [
                 {
@@ -82,7 +83,7 @@ function createCalculatedMetric() {
 ## Base Metric: Response Time (RESPONSE_TIME)
 ## Dimension: URL
 ## Condition: service tag [$TAG_CONTEXT]$TAG_KEY:TAG_VALUE
-createCalculatedMetric "calc:service.topurlresponsetime" "Top URL Response Time" "RESPONSE_TIME" "$TAG_CONTEXT" "$TAG_KEY" "$TAG_VALUE" "URL" "{URL:Path}"
+createCalculatedMetric "calc:service.topurlresponsetime" "Top URL Response Time" "RESPONSE_TIME" "MICRO_SECOND" "$TAG_CONTEXT" "$TAG_KEY" "$TAG_VALUE" "URL" "{URL:Path}"
 
 
 ## Creates a Calculated Service Metrics "Top URL Service Calls"
@@ -90,14 +91,14 @@ createCalculatedMetric "calc:service.topurlresponsetime" "Top URL Response Time"
 ## Base Metric: Number of calls to other services (NON_DATABASE_CHILD_CALL_COUNT)
 ## Dimension: URL
 ## Condition: service tag [$TAG_CONTEXT]$TAG_KEY:TAG_VALUE
-createCalculatedMetric "calc:service.topurlservicecalls" "Top URL Service Calls" "NON_DATABASE_CHILD_CALL_COUNT" "$TAG_CONTEXT" "$TAG_KEY" "$TAG_VALUE" "URL" "{URL:Path}"
+createCalculatedMetric "calc:service.topurlservicecalls" "Top URL Service Calls" "NON_DATABASE_CHILD_CALL_COUNT" "COUNT" "$TAG_CONTEXT" "$TAG_KEY" "$TAG_VALUE" "URL" "{URL:Path}"
 
 ## Creates a Calculated Service Metrics "Top URL Service Calls"
 ## Metrics Id: calc:service.topurlservicecalls
 ## Base Metric: Number of calls to other services (NON_DATABASE_CHILD_CALL_COUNT)
 ## Dimension: URL
 ## Condition: service tag [$TAG_CONTEXT]$TAG_KEY:TAG_VALUE
-createCalculatedMetric "calc:service.topurldbcalls" "Top URL DB Calls" "DATABASE_CHILD_CALL_COUNT" "$TAG_CONTEXT" "$TAG_KEY" "$TAG_VALUE" "URL" "{URL:Path}"
+createCalculatedMetric "calc:service.topurldbcalls" "Top URL DB Calls" "DATABASE_CHILD_CALL_COUNT" "COUNT" "$TAG_CONTEXT" "$TAG_KEY" "$TAG_VALUE" "URL" "{URL:Path}"
 
 
 ## Creates a Calculated Service Metrics "Test Step Response Time"
