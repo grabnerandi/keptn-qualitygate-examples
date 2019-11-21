@@ -30,7 +30,7 @@ function createCalculatedMetric() {
     CONDITION_VALUE=$7
     DIMENSION_NAME=$8
     DIMENSION_DEFINTION=$9
-    DIMENSION_AGGREGATE=$10
+    DIMENSION_AGGREGATE=${10}
 
     PAYLOAD='{
             "tsmMetricKey": "'$METRICKEY'",
@@ -77,6 +77,8 @@ function createCalculatedMetric() {
         -H 'Content-Type: application/json; charset=utf-8' \
         -d "$PAYLOAD" \
         -o curloutput.txt
+
+    cat curloutput.txt
 }
 
 ## Creates a Calculated Service Metrics "Top URL Response Time""
