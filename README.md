@@ -160,7 +160,7 @@ Here are some additional examples for start-evaluation
 ~/keptn send event start-evaluation --project=sample --service=sampleservice --stage=hardening --timeframe=1h
 ```
 
-# 4. Understanding and extending SLIs
+# 4. Understanding and extending SLIs with Dynatrace Calculated Service Metrics
 
 Dynatrace's [Metrics APIv2](https://www.dynatrace.com/support/help/extend-dynatrace/dynatrace-api/environment-api/metric/selector-transformations/) provides powerful query options. Besides specifying the metric you want you can define use the scope option to filter on tags, management zones, entities, dimensions ...
 When keptn executes these queries you can use a bunch of placeholders that keptn passes to the SLI services. More details can be found in the [Dynatrace SLI documentation](https://github.com/keptn-contrib/dynatrace-sli-service/tree/release-0.1.0). If you have tagged your services with project, service or stage you can use these placeholders like shown on that doc page, e.g:
@@ -170,7 +170,7 @@ scope=tag(keptn_project:$PROJECT),tag(keptn_stage:$STAGE),tag(keptn_service:$SER
 
 As of **keptn 0.6.beta** the SLIs have to either be specified globally for the whole keptn Dynatrace SLI installation or you can define them per keptn project. In both cases the SLI definitions are stored as ConfigMap in k8s. This will change with the final release so SLIs can also be specified in Git which makes it much easier to modify.
 
-# 4.1 Adding a Calculated Service Metric for Response Time & Database Activity split by URL
+## 4.1 Adding a Calculated Service Metric for Response Time & Database Activity split by URL
 
 One of the key requirements from users on quality gates was to not just define SLOs on overall Response Time of a service but rather define different SLOs for the different URL endpoints, e.g: /api/login, /api/logout, /api/somethingelse like I can see them in the Service Details views
 ![](sample/images/dnatrace-top-requests-view.png)
@@ -187,4 +187,44 @@ Metrics are not calculated for every distributed trace but only those that meet 
 ```
 
 After this script runs you should see three service metric definitions in dynatrace. Go to Settings -> server-side monitoring -> Service Metrics
+![](sample/images/dynatrace-custom-service-metrics.png)
+
+These metrics are now available for charting - in my case I can see my individual endpoints such as /api/invoke, /health, ...
+![](sample/images/dynatrace-custom-metric-chart.png)
+
+## 4.2 Include new metrics in SLI and SLO
+
+In order for keptn to query these new metrics we need to extend the SLI and add these metrics to the SLO. 
+I have prepared a new sample_dynatrace_sli_extended.yaml file which includes queries to these three metrics - focusing on my /api/invoke endpoint. 
+**ATTENTION**: If you want to use this with your service you need to edit the sli yaml and change the filter to match one of your endpoints.
+![](sample/images/sli_custom_urlendpoints.png) 
+
+Now its time to update the SLI. As of **keptn 0.6.beta** this has to be done by updating the config map via kubectl apply:
+```
+kubectl apply -f sample_dynatrace_sli_extended.yaml
+```
+
+Last thing we need to do is extend the SLO to include these 3 new SLI definitions. To keep it simply I only add these SLIs without any conditions. 
+Where do we change that? Just in Git as our SLOs are version controlled for our service for every stage. In our case we add the following three lines to the slo.yaml in simpleservice in the hardening branch:
+```
+  - sli: rt_invoke_avg
+  - sli: count_svccalls_invoke
+  - sli: count_dbcalls_invoke
+```
+Here my git update:
+![](sample/images/slo-git-update.png)
+
+## 4.3 Lets run another quality gate evaluation
+
+With the updated SLI and SLO in place we can run another evaluation run just as we did before!
+
+```
+~/keptn send event start-evaluation --project=sample --service=sampleservice --stage=hardening --timeframe=10m --start=2019-11-21T11:00:00
+```
+
+And then wait for the result via the CLI or just opening up the keptns Bridge
+
+# 5 Interacting with Keptn via the API
+
+## 5.1 Sending Start Evaluation Events
 

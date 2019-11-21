@@ -63,6 +63,7 @@ PAYLOAD='{
     }
   }'
 
+echo ""
 echo "Creating Metric $METRICNAME($METRICNAME)"
 echo "$PAYLOAD"
 curl -X PUT \
@@ -74,3 +75,4 @@ curl -X PUT \
         -o curloutput.txt
 
 cat curloutput.txt
+echo ""
