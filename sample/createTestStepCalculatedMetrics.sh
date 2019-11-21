@@ -11,35 +11,37 @@ read -rsp $'Press ctrl-c to abort. Press any key to continue...\n' -n1 key
 
 METRICKEY="calc:service.teststepresponsetime"
 METRICNAME="Test Step Response Time"
-PAYLOAD='"tsmMetricKey": "'$METRICKEY'",
-  "name": "'$METRICNAME'",
-  "enabled": true,
-  "metricDefinition": {
-    "metric": "RESPONSE_TIME",
-    "requestAttribute": null
-  },
-  "unit": "MICRO_SECOND",
-  "unitDisplayName": "",
-  "conditions": [
-    {
-      "attribute": "SERVICE_REQUEST_ATTRIBUTE",
-      "comparisonInfo": {
-        "type": "STRING_REQUEST_ATTRIBUTE",
-        "comparison": "EXISTS",
-        "value": null,
-        "negate": false,
-        "requestAttribute": "TSN",
-        "caseSensitive": false
-      }
+PAYLOAD='{
+    "tsmMetricKey": "'$METRICKEY'",
+    "name": "'$METRICNAME'",
+    "enabled": true,
+    "metricDefinition": {
+        "metric": "RESPONSE_TIME",
+        "requestAttribute": null
+    },
+    "unit": "MICRO_SECOND",
+    "unitDisplayName": "",
+    "conditions": [
+        {
+            "attribute": "SERVICE_REQUEST_ATTRIBUTE",
+            "comparisonInfo": {
+                "type": "STRING_REQUEST_ATTRIBUTE",
+                "comparison": "EXISTS",
+                "value": null,
+                "negate": false,
+                "requestAttribute": "TSN",
+                "caseSensitive": false
+            }
+        }
+    ],
+    "dimensionDefinition": {
+        "name": "Test Step",
+        "dimension": "{RequestAttribute:TSN}",
+        "placeholders": [],
+        "topX": 10,
+        "topXDirection": "DESCENDING",
+        "topXAggregation": "SUM"
     }
-  ],
-  "dimensionDefinition": {
-    "name": "Test Step",
-    "dimension": "{RequestAttribute:TSN}",
-    "placeholders": [],
-    "topX": 10,
-    "topXDirection": "DESCENDING",
-    "topXAggregation": "SUM"
   }'
 
 echo "Creating Metric $METRICNAME($METRICNAME)"
