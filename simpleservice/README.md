@@ -228,3 +228,9 @@ We are now ready and can run a new deployment
 ```
 keptn send event new-artifact --project=simpleproject --service=simplenode --image=docker.io/grabnerandi/simplenodeservice --tag=1.0.0
 ```
+
+
+# 4. Enable Integration with Slack, MS Teams ...
+
+One of the keptn contrib projects can forward notifications to ChatOps tools such as Slack, MS Teams, ...
+In order to setup this integration we have to install the Notification Service and configure it with e.g: Slack Webhook URL
