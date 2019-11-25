@@ -147,7 +147,7 @@ In a few seconds you should start seeing data in Dynatrace for your monitored EK
 Keptn has a central service called Lighthouse services which does all the pulling of data from different data providers (SLI providers), stores the data in the backend mongodb and also does the SLO validation based on the SLO definition. The first thing we need to do is to install the Dynatrace SLI data provider which is one of the providers currently supported!
 The following script will re-use the Dynatrace Tenant URL and the API Token that was created in the previous step. It assume those values are still available in ~/dynatrace-servie/deploy/scripts/creds_dt.json. If thats not the case feel free to adapt the setupDynatraceSLIService.sh script.
 ```
-cd ~/keptn-qualitygate-examples/keptn
+cd ~/keptn-qualitygate-examples/simpleservice/keptn
 ./setupDynatraceSLIService.sh
 ```
 
