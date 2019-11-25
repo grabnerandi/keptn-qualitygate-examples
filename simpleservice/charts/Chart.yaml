@@ -1,0 +1,4 @@
+apiVersion: v1
+description: A Helm chart for Simpleservice to be used by keptn
+name: Simpleservice
+version: 0.1.0
