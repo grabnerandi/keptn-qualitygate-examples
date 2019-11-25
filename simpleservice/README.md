@@ -19,7 +19,7 @@ Keptn installs its own Git. In order to modify SLIs & SLOs that are managed by k
 
 In my case I simply create a GitHub repo like this:
 
-![](images/github-repo-create.png)
+![](images/github_repo_create.png)
 
 ## PreReq.2 Dynatrace Token
 This example shows keptn quality gates based on Dynatrace metrics using the new [Dynatrace Metrics v2 API](https://www.dynatrace.com/support/help/extend-dynatrace/dynatrace-api/environment-api/metric/).
@@ -30,7 +30,7 @@ Hence you need Dynatrace that instruments the services you want to validate SLOs
 
 
 # 1. Installing EKS Cluster & Keptn
-## 1.1 Install Required Tools: aws, kubectl, eksctl, git
+## 1.1 Install Required Tools: aws, kubectl, eksctl, git, jq
 
 If you have aws, kubectl & eksctl installed on your local workstation go ahead with those.
 If not you can follow my approach which is launching a t2.micro Amazon Linux EC2 and then execute the following
@@ -56,7 +56,7 @@ mkdir -p $HOME/bin && cp ./kubectl $HOME/bin/kubectl && export PATH=$HOME/bin:$P
 echo 'export PATH=$HOME/bin:$PATH' >> ~/.bash_profile
 ```
 
-Last is eksctl:
+Next is eksctl:
 ```
 curl --silent --location "https://github.com/weaveworks/eksctl/releases/download/latest_release/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
 sudo mv /tmp/eksctl /usr/local/bin
@@ -66,6 +66,11 @@ As we need some files from this Git repo later on our workstation lets install g
 ```
 sudo yum install git
 git clone https://github.com/grabnerandi/keptn-qualitygate-examples
+```
+
+And last tool is jq which some of our scripts need:
+```
+sudo yum install jq
 ```
 
 ## 1.2 Create EKS cluster with kubectl
@@ -114,9 +119,14 @@ You can validate that this really works by opening the browser to that API URL a
 Last thing we do is to expose the Keptn's bridge to the outside world. By default the bridge is not exposed and only accessible internally - but - for our use case it is ok to expose it as a virtual service so we can access it via https://bridge.keptn.YOURDOMAIN.
 
 ```
-./keptn/exposeBridge.sh
+cd keptn
+./exposeBridge.sh
 ```
 You should now be able to access the Keptns Bridge via the URL shown in the exposeBridge.sh output
+![](images/expose_bridge.png)
+
+And you should have access to bridge (after confirming that you trust the SSL certificate):
+![](images/keptn_bridge.png)
 
 ## 1.5 Install Dynatrace Service
 
@@ -130,11 +140,90 @@ cd dynatrace-service/deploy/scripts
 ```
 
 In a few seconds you should start seeing data in Dynatrace for your monitored EKS cluster. Navigate to your Hosts and click on the new entry.
+![](images/eks_host_monitor_dynatrace.png)
+
+## 1.6 Installing Dynatrace SLI Service
+
+Keptn has a central service called Lighthouse services which does all the pulling of data from different data providers (SLI providers), stores the data in the backend mongodb and also does the SLO validation based on the SLO definition. The first thing we need to do is to install the Dynatrace SLI data provider which is one of the providers currently supported!
+The following script will re-use the Dynatrace Tenant URL and the API Token that was created in the previous step. It assume those values are still available in ~/dynatrace-servie/deploy/scripts/creds_dt.json. If thats not the case feel free to adapt the setupDynatraceSLIService.sh script.
+```
+cd ~/keptn-qualitygate-examples/keptn
+./setupDynatraceSLIService.sh
+```
 
 # 3. Configure Keptn to manage our Simpleservice
 
 In order for keptn to take control for automated delivery and operations for our application we need to do the following
-1. Create a keptn project called keptn06_sample with a two stage shipyard file
+1. Create a keptn project called simpleproject with a two stage shipyard file
 2. Onboard our service called simpleservice with a pre-defined helm chart
 3. Upload supporting files such as SLIs, SLOs & tests
 4. Configure Dynatrace SLI Service
+
+## 3.1 Create Keptn Project
+
+We create a new project with the name simpleproject, use the shipyard.yaml that defines 2 stages and configure the remote Git so that keptn automatically pushes all configurations to our Git repo. In my case thats a rep on GitHub:
+
+```
+cd ~/keptn-qualitygate-examples/simpleservice
+keptn create project simpleproject --shipyard=./shipyard.yaml --git-user=GIT_USER --git-token=GIT_TOKEN --git-remote-url=GIT_REMOTE_URL
+```
+
+## 3.2 Create Keptn Service
+
+In our new keptn project we can now create a new service.
+
+```
+keptn onboard service simplenode --project=simpleproject --chart=./charts
+```
+
+## 3.3 Adding JMeter Test Files 
+
+First we add our JMeter tests to both staging and prod
+
+```
+keptn add-resource --project=simpleproject --service=simplenode --stage=staging --resource=jmeter/basiccheck.jmx --resourceUri=jmeter/basiccheck.jmx
+keptn add-resource --project=simpleproject --service=simplenode --stage=staging --resource=jmeter/load.jmx --resourceUri=jmeter/load.jmx
+keptn add-resource --project=simpleproject --service=simplenode --stage=prod --resource=jmeter/basiccheck.jmx --resourceUri=jmeter/basiccheck.jmx
+keptn add-resource --project=simpleproject --service=simplenode --stage=prod --resource=jmeter/load.jmx --resourceUri=jmeter/load.jmx
+```
+
+## 3.4 Adding SLOs (Service Level Objectives)
+
+We are adding the simple_dynatrace_slo.yaml which defines 5 objectives to each stage.
+
+```
+keptn add-resource --project=simpleproject --service=simplenode --stage=staging --resource=simple_dynatrace_slo.yaml --resourceUri=slo.yaml
+keptn add-resource --project=simpleproject --service=simplenode --stage=prod --resource=simple_dynatrace_slo.yaml --resourceUri=slo.yaml
+```
+
+## 3.5 Enabling Dynatrace SLI Service for our project
+
+While we have installed the Dynatrace SLI Data Source for keptn we have to enable and configure it for each project. 
+The enableDynatraceSLIForProjects.sh actually does two things: 
+1) creates a a config map entry for the lighthouse service to know which SLI providers to use for this project and 
+2) puts the previously provided Dynatrace Token and URL in a secret that the Dynatrace SLI can use to query data from Dynatrace during the actual quality gate evaluation.
+
+Ready? lets set it up for the sample project
+```
+./enableDynatraceSLIForProject.sh simpleproject
+```
+
+## 3.5 (Optional) Defining Custom SLIs for our Keptn Project
+
+When we installed the Dynatrace SLI Data Source it came with a pre-configured set of 5 SLIs as [described here](https://github.com/keptn-contrib/dynatrace-sli-service/tree/release-0.1.0).
+We can define custom SLIs for each project so that you can base your SLOs on more than the 5 default SLIs that the default installation comes with
+
+**As of keptn 0.6 beta** the SLIs (Definition of Metrics & Queries) are stored as Config Map Entries. This will change for the final release as they will also be stored in the Git repo which makes it easier to change SLIs. Check out the sample_dynatrace_sli.yaml and the 5 SLIs I specified. You will notice the new Dynatrace Metrics API Query Langauge!
+
+```
+kubectl apply -f sample_dynatrace_sli.yaml
+```
+
+
+## 3.4 Run a new deployment
+
+We are now ready and can run a new deployment
+
+```
+keptn send event new-artifact --project=simpleproject --service=simplenode --image=docker.io/grabnerandi/simplenodeservice --tag=1.0.0
+```

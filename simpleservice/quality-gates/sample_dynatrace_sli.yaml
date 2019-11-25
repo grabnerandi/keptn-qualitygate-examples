@@ -3,7 +3,7 @@
 kind: ConfigMap
 apiVersion: v1
 metadata:
-  name: dynatrace-sli-config-keptn06_sample
+  name: dynatrace-sli-config-simpleservice
   namespace: keptn
 data:
   custom-queries: |
