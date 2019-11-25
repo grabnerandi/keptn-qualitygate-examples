@@ -1,9 +1,9 @@
-# add using kubectl apply -f sample_dynatrace_sli_extended.yaml
+# add using kubectl apply -f simple_dynatrace_sli_extended.yaml
 
 kind: ConfigMap
 apiVersion: v1
 metadata:
-  name: dynatrace-sli-config-simpleservice
+  name: dynatrace-sli-config-simpleproject
   namespace: keptn
 data:
   custom-queries: |
