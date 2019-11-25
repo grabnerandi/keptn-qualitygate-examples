@@ -106,7 +106,7 @@ As the output explains, keptn installs Istio and with that comes an Ingress Gate
 
 Now we configure keptn to be aware of this domain to correctly handle incoming requests on *.YOURKEPTNDOMAIN. Here is the call for my domain (make sure you use your Route53 domain):
 ```
-keptn configure domain keptn06-agrabner.demo.keptn.sh
+keptn configure domain keptn06-agrabner.demo.keptn.sh --keptn-version=release-0.6.0.beta
 ```
 At the end the output should say: CLI is authenticated against the Keptn cluster https://api.keptn.keptn06-agrabner.demo.keptn.sh
 
@@ -228,9 +228,3 @@ We are now ready and can run a new deployment
 ```
 keptn send event new-artifact --project=simpleproject --service=simplenode --image=docker.io/grabnerandi/simplenodeservice --tag=1.0.0
 ```
-
-
-# 4. Enable Integration with Slack, MS Teams ...
-
-One of the keptn contrib projects can forward notifications to ChatOps tools such as Slack, MS Teams, ...
-In order to setup this integration we have to install the Notification Service and configure it with e.g: Slack Webhook URL
