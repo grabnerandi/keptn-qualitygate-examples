@@ -192,8 +192,8 @@ keptn add-resource --project=simpleproject --service=simplenode --stage=prod --r
 We are adding the simple_dynatrace_slo.yaml which defines 5 objectives to each stage.
 
 ```
-keptn add-resource --project=simpleproject --service=simplenode --stage=staging --resource=simple_dynatrace_slo.yaml --resourceUri=slo.yaml
-keptn add-resource --project=simpleproject --service=simplenode --stage=prod --resource=simple_dynatrace_slo.yaml --resourceUri=slo.yaml
+keptn add-resource --project=simpleproject --service=simplenode --stage=staging --resource=quality-gates/simple_slo.yaml --resourceUri=slo.yaml
+keptn add-resource --project=simpleproject --service=simplenode --stage=prod --resource=quality-gates/simple_slo.yaml --resourceUri=slo.yaml
 ```
 
 ## 3.5 Enabling Dynatrace SLI Service for our project
@@ -205,6 +205,7 @@ The enableDynatraceSLIForProjects.sh actually does two things:
 
 Ready? lets set it up for the sample project
 ```
+cd keptn
 ./enableDynatraceSLIForProject.sh simpleproject
 ```
 
