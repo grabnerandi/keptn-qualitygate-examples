@@ -1,13 +1,27 @@
 #!/bin/bash
 
 # Usage:
-# ./createTestStepCalculatedMetrics.sh CONTEXTLESS sampleservice-hardening
+# ./createTestStepCalculatedMetrics.sh CONTEXTLESS keptn-project simpleproject
 
-DT_TENANT=$(cat ../common/creds_dt.json | jq -r '.dynatraceTenant')
-DT_API_TOKEN=$(cat ../common/creds_dt.json | jq -r '.dynatraceApiToken')
+if [[ -z "$DT_TENANT" ]]; then
+  DT_TENANT=$(cat ~/dynatrace-service/deploy/scripts/creds_dt.json | jq -r '.dynatraceTenant')
+fi
+if [[ -z "$DT_API_TOKEN" ]]; then
+  DT_API_TOKEN=$(cat ~/dynatrace-service/deploy/scripts/creds_dt.json | jq -r '.dynatraceApiToken')
+fi
+if [[ -z "$DT_TENANT" || -z "$DT_API_TOKEN" ]]; then
+  echo "DT_TENANT & DT_API_TOKEN MUST BE SET!!"
+  exit 1
+fi
 CONDITION_CONTEXT=$1
 CONDITION_KEY=$2
 CONDITION_VALUE=$3
+
+if [[ -z "$CONDITION_KEY" && -z "$CONDITION_VALUE" ]]; then
+  echo "You have to at least specify a Tag Key or Value as a filter:"
+  echo "Usage: ./createTestStepCalculatedMetrics.sh CONTEXTLESS keptn-project simpleproject"
+  exit 1
+fi
 
 echo "============================================================="
 echo "About to create 1 service metrics for Test Integrations [$1]$2:$3 on Dynatrace Tenant: $DT_TENANT!"
@@ -65,6 +79,7 @@ PAYLOAD='{
 
 echo ""
 echo "Creating Metric $METRICNAME($METRICNAME)"
+echo "PUT https://$DT_TENANT/api/config/v1/customMetric/service/$METRICKEY"
 echo "$PAYLOAD"
 curl -X PUT \
         "https://$DT_TENANT/api/config/v1/customMetric/service/$METRICKEY" \
