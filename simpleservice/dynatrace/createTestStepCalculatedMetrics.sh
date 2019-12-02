@@ -29,115 +29,96 @@ echo "============================================================="
 echo "Usage: ./createTestStepCalculatedMetrics CONTEXT KEY VALUE"
 read -rsp $'Press ctrl-c to abort. Press any key to continue...\n' -n1 key
 
-PAYLOAD='{
-    "tsmMetricKey": "'$METRICKEY'",
-    "name": "'$METRICNAME'",
-    "enabled": true,
-    "metricDefinition": {
-        "metric": "'$BASEMETRIC'",
-        "requestAttribute": null
-    },
-    "unit": "MICRO_SECOND",
-    "unitDisplayName": "",
-    "conditions": [
-        {
-            "attribute": "SERVICE_REQUEST_ATTRIBUTE",
-            "comparisonInfo": {
-                "type": "STRING_REQUEST_ATTRIBUTE",
-                "comparison": "EXISTS",
-                "value": null,
-                "negate": false,
-                "requestAttribute": "TSN",
-                "caseSensitive": false
-            }
+####################################################################################################################
+## createCalculatedTestMetric(METRICKEY, METRICNAME, BASEMETRIC, METRICUNIT)
+####################################################################################################################
+# Example: createCalculatedTestMetric "calc:service.teststepresponsetime", "Test Step Response Time", "RESPONSE_TIME", "MICRO_SECOND", "CONTEXTLESS", "keptn_project", "simpleproject")
+# Full List of possible BASEMETRICS: CPU_TIME, DATABASE_CHILD_CALL_COUNT, DATABASE_CHILD_CALL_TIME, EXCEPTION_COUNT, FAILED_REQUEST_COUNT, FAILED_REQUEST_COUNT_CLIENT, FAILURE_RATE, FAILURE_RATE_CLIENT, HTTP_4XX_ERROR_COUNT, HTTP_4XX_ERROR_COUNT_CLIENT, HTTP_5XX_ERROR_COUNT, HTTP_5XX_ERROR_COUNT_CLIENT, IO_TIME, LOCK_TIME, NON_DATABASE_CHILD_CALL_COUNT, NON_DATABASE_CHILD_CALL_TIME, REQUEST_ATTRIBUTE, REQUEST_COUNT, RESPONSE_TIME, RESPONSE_TIME_CLIENT, SUCCESSFUL_REQUEST_COUNT, SUCCESSFUL_REQUEST_COUNT_CLIENT, TOTAL_PROCESSING_TIME, WAIT_TIME
+# Possible METRICUNIT values: MICRO_SECOND, COUNT, PERCENT 
+function createCalculatedTestMetric() {
+    METRICKEY=$1
+    METRICNAME=$2
+    BASEMETRIC=$3
+    METRICUNIT=$4
+    PAYLOAD='{
+        "tsmMetricKey": "'$METRICKEY'",
+        "name": "'$METRICNAME'",
+        "enabled": true,
+        "metricDefinition": {
+            "metric": "'$BASEMETRIC'",
+            "requestAttribute": null
         },
-        {
-            "attribute": "SERVICE_TAG",
-            "comparisonInfo": {
-                "type": "TAG",
-                "comparison": "EQUALS",
-                "value": {
-                    "context": "'$CONDITION_CONTEXT'",
-                    "key": "'$CONDITION_KEY'",
-                    "value": "'$CONDITION_VALUE'"
-                },
-                "negate": false
+        "unit": "'$METRICUNIT'",
+        "unitDisplayName": "",
+        "conditions": [
+            {
+                "attribute": "SERVICE_REQUEST_ATTRIBUTE",
+                "comparisonInfo": {
+                    "type": "STRING_REQUEST_ATTRIBUTE",
+                    "comparison": "EXISTS",
+                    "value": null,
+                    "negate": false,
+                    "requestAttribute": "TSN",
+                    "caseSensitive": false
+                }
+            },
+            {
+                "attribute": "SERVICE_TAG",
+                "comparisonInfo": {
+                    "type": "TAG",
+                    "comparison": "EQUALS",
+                    "value": {
+                        "context": "'$CONDITION_CONTEXT'",
+                        "key": "'$CONDITION_KEY'",
+                        "value": "'$CONDITION_VALUE'"
+                    },
+                    "negate": false
+                }
             }
+        ],
+        "dimensionDefinition": {
+            "name": "Test Step",
+            "dimension": "{RequestAttribute:TSN}",
+            "placeholders": [],
+            "topX": 10,
+            "topXDirection": "DESCENDING",
+            "topXAggregation": "SUM"
         }
-    ],
-    "dimensionDefinition": {
-        "name": "Test Step",
-        "dimension": "{RequestAttribute:TSN}",
-        "placeholders": [],
-        "topX": 10,
-        "topXDirection": "DESCENDING",
-        "topXAggregation": "SUM"
-    }
-  }'
+      }'
+
+  echo ""
+  echo "Creating Metric $METRICNAME($METRICNAME)"
+  echo "PUT https://$DT_TENANT/api/config/v1/customMetric/service/$METRICKEY"
+  echo "$PAYLOAD"
+  curl -X PUT \
+          "https://$DT_TENANT/api/config/v1/customMetric/service/$METRICKEY" \
+          -H 'accept: application/json; charset=utf-8' \
+          -H "Authorization: Api-Token $DT_API_TOKEN" \
+          -H 'Content-Type: application/json; charset=utf-8' \
+          -d "$PAYLOAD" \
+          -o curloutput.txt
+  cat curloutput.txt
+  echo ""
+}
+
+
 
 ###########################################################################
 # First we create Test Step Response Time
 ###########################################################################
-METRICKEY="calc:service.teststepresponsetime"
-METRICNAME="Test Step Response Time"
-BASEMETRIC="RESPONSE_TIME"
-
-echo ""
-echo "Creating Metric $METRICNAME($METRICNAME)"
-echo "PUT https://$DT_TENANT/api/config/v1/customMetric/service/$METRICKEY"
-echo "$PAYLOAD"
-curl -X PUT \
-        "https://$DT_TENANT/api/config/v1/customMetric/service/$METRICKEY" \
-        -H 'accept: application/json; charset=utf-8' \
-        -H "Authorization: Api-Token $DT_API_TOKEN" \
-        -H 'Content-Type: application/json; charset=utf-8' \
-        -d "$PAYLOAD" \
-        -o curloutput.txt
-
-cat curloutput.txt
-echo ""
+createCalculatedTestMetric "calc:service.teststepresponsetime", "Test Step Response Time", "RESPONSE_TIME", "MICRO_SECOND"
 
 ###########################################################################
 # Second we create Test Step Service Calls
 ###########################################################################
-METRICKEY="calc:service.teststepservicecalls"
-METRICNAME="Test Step Service Calls"
-BASEMETRIC="NON_DATABASE_CHILD_CALL_COUNT"
-
-echo ""
-echo "Creating Metric $METRICNAME($METRICNAME)"
-echo "PUT https://$DT_TENANT/api/config/v1/customMetric/service/$METRICKEY"
-echo "$PAYLOAD"
-curl -X PUT \
-        "https://$DT_TENANT/api/config/v1/customMetric/service/$METRICKEY" \
-        -H 'accept: application/json; charset=utf-8' \
-        -H "Authorization: Api-Token $DT_API_TOKEN" \
-        -H 'Content-Type: application/json; charset=utf-8' \
-        -d "$PAYLOAD" \
-        -o curloutput.txt
-
-cat curloutput.txt
-echo ""
+createCalculatedTestMetric "calc:service.teststepservicecalls", "Test Step Service Calls", "NON_DATABASE_CHILD_CALL_COUNT", "COUNT"
 
 ###########################################################################
-# Third we create Test Step Service Calls
+# Third we create Test Step Database Calls
 ###########################################################################
-METRICKEY="calc:service.teststepdbcalls"
-METRICNAME="Test Step DB Calls"
-BASEMETRIC="NON_DATABASE_CHILDATABASE_CHILD_CALL_COUNTD_CALL_COUNT"
+createCalculatedTestMetric "calc:service.teststepdbcalls", "Test Step DB Calls", "DATABASE_CHILD_CALL_COUNT", "COUNT"
 
-echo ""
-echo "Creating Metric $METRICNAME($METRICNAME)"
-echo "PUT https://$DT_TENANT/api/config/v1/customMetric/service/$METRICKEY"
-echo "$PAYLOAD"
-curl -X PUT \
-        "https://$DT_TENANT/api/config/v1/customMetric/service/$METRICKEY" \
-        -H 'accept: application/json; charset=utf-8' \
-        -H "Authorization: Api-Token $DT_API_TOKEN" \
-        -H 'Content-Type: application/json; charset=utf-8' \
-        -d "$PAYLOAD" \
-        -o curloutput.txt
-
-cat curloutput.txt
-echo ""
-
+###########################################################################
+# Fourth we create Test Step Failurerate
+###########################################################################
+createCalculatedTestMetric "calc:service.teststeperrorrate", "Test Step Failure Rate", "FAILURE_RATE", "PERCENT"
