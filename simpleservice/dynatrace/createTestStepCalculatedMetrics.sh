@@ -29,14 +29,12 @@ echo "============================================================="
 echo "Usage: ./createTestStepCalculatedMetrics CONTEXT KEY VALUE"
 read -rsp $'Press ctrl-c to abort. Press any key to continue...\n' -n1 key
 
-METRICKEY="calc:service.teststepresponsetime"
-METRICNAME="Test Step Response Time"
 PAYLOAD='{
     "tsmMetricKey": "'$METRICKEY'",
     "name": "'$METRICNAME'",
     "enabled": true,
     "metricDefinition": {
-        "metric": "RESPONSE_TIME",
+        "metric": "'$BASEMETRIC'",
         "requestAttribute": null
     },
     "unit": "MICRO_SECOND",
@@ -77,6 +75,13 @@ PAYLOAD='{
     }
   }'
 
+###########################################################################
+# First we create Test Step Response Time
+###########################################################################
+METRICKEY="calc:service.teststepresponsetime"
+METRICNAME="Test Step Response Time"
+BASEMETRIC="RESPONSE_TIME"
+
 echo ""
 echo "Creating Metric $METRICNAME($METRICNAME)"
 echo "PUT https://$DT_TENANT/api/config/v1/customMetric/service/$METRICKEY"
@@ -91,3 +96,48 @@ curl -X PUT \
 
 cat curloutput.txt
 echo ""
+
+###########################################################################
+# Second we create Test Step Service Calls
+###########################################################################
+METRICKEY="calc:service.teststepservicecalls"
+METRICNAME="Test Step Service Calls"
+BASEMETRIC="NON_DATABASE_CHILD_CALL_COUNT"
+
+echo ""
+echo "Creating Metric $METRICNAME($METRICNAME)"
+echo "PUT https://$DT_TENANT/api/config/v1/customMetric/service/$METRICKEY"
+echo "$PAYLOAD"
+curl -X PUT \
+        "https://$DT_TENANT/api/config/v1/customMetric/service/$METRICKEY" \
+        -H 'accept: application/json; charset=utf-8' \
+        -H "Authorization: Api-Token $DT_API_TOKEN" \
+        -H 'Content-Type: application/json; charset=utf-8' \
+        -d "$PAYLOAD" \
+        -o curloutput.txt
+
+cat curloutput.txt
+echo ""
+
+###########################################################################
+# Third we create Test Step Service Calls
+###########################################################################
+METRICKEY="calc:service.teststepdbcalls"
+METRICNAME="Test Step DB Calls"
+BASEMETRIC="NON_DATABASE_CHILDATABASE_CHILD_CALL_COUNTD_CALL_COUNT"
+
+echo ""
+echo "Creating Metric $METRICNAME($METRICNAME)"
+echo "PUT https://$DT_TENANT/api/config/v1/customMetric/service/$METRICKEY"
+echo "$PAYLOAD"
+curl -X PUT \
+        "https://$DT_TENANT/api/config/v1/customMetric/service/$METRICKEY" \
+        -H 'accept: application/json; charset=utf-8' \
+        -H "Authorization: Api-Token $DT_API_TOKEN" \
+        -H 'Content-Type: application/json; charset=utf-8' \
+        -d "$PAYLOAD" \
+        -o curloutput.txt
+
+cat curloutput.txt
+echo ""
+

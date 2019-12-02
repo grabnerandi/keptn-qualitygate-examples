@@ -1,0 +1,13 @@
+Create Management Zone
+Create Dashboard
+Create Synthetic Test
+Execute Auto Remediation
+
+Send Evaluation Event
+Get Evaluation Result
+
+Request Attributes for Tests
+Calculated SErvice Metrics for Tests 
+SLIs based on Test Names
+
+Load Test Container

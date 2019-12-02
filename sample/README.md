@@ -65,12 +65,25 @@ Hence you need Dynatrace that instruments the services you want to validate SLOs
 ## 1.1 Install Keptn Quality Gates on GKE
 
 Open your Linux shell where you are connected to your GKE cluster. You can validate it by executing kubectl get nodes (but I guess you knew that already) :-)
-In that same shell lets start by cloning this repo and install keptn as shown below:
+First we download the keptn CLI (right now 0.6.0.beta) in our home directory!
+```
+wget https://storage.googleapis.com/keptn-cli/0.6.0.beta/keptn-linux.tar.gz
+tar -xvf keptn-linux.tar.gz
+chmod +x keptn 
+mv keptn ~
+rm keptn-linux.tar.gz
+```
+
+Now lets install keptn with the quality gates use case only
+```
+~/keptn install -p=kubernetes --keptn-version=0.6.0.beta --use-case=quality-gates --verbose
+```
+
+In that same shell lets start by cloning this repo and execute a script I prepared that exposes the keptn's bridge:
 ```
 git clone https://github.com/grabnerandi/keptn-qualitygate-examples
 cd keptn-qualitygate-examples
 cd common
-./installKeptnQualityGates.sh
 ./exposeBridge.sh
 ```
 Validate Keptn install is done and successful by looking at the console output. exposeBridge.sh will expose the keptns bridge under a URL with the format https://bridge.keptn.1.2.3.4.xip.io. Should look like this:
