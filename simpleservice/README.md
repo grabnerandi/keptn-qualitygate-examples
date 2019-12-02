@@ -228,3 +228,6 @@ We are now ready and can run a new deployment
 ```
 keptn send event new-artifact --project=simpleproject --service=simplenode --image=docker.io/grabnerandi/simplenodeservice --tag=1.0.0
 ```
+
+As the deployment runs you can watch the progress through the keptns bridge.
+Or you can see the events in Dynatrace as they got pushed by the Dynatrace keptn Service:
