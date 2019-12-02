@@ -35,11 +35,13 @@ read -rsp $'Press ctrl-c to abort. Press any key to continue...\n' -n1 key
 # Example: createCalculatedTestMetric "calc:service.teststepresponsetime", "Test Step Response Time", "RESPONSE_TIME", "MICRO_SECOND", "CONTEXTLESS", "keptn_project", "simpleproject")
 # Full List of possible BASEMETRICS: CPU_TIME, DATABASE_CHILD_CALL_COUNT, DATABASE_CHILD_CALL_TIME, EXCEPTION_COUNT, FAILED_REQUEST_COUNT, FAILED_REQUEST_COUNT_CLIENT, FAILURE_RATE, FAILURE_RATE_CLIENT, HTTP_4XX_ERROR_COUNT, HTTP_4XX_ERROR_COUNT_CLIENT, HTTP_5XX_ERROR_COUNT, HTTP_5XX_ERROR_COUNT_CLIENT, IO_TIME, LOCK_TIME, NON_DATABASE_CHILD_CALL_COUNT, NON_DATABASE_CHILD_CALL_TIME, REQUEST_ATTRIBUTE, REQUEST_COUNT, RESPONSE_TIME, RESPONSE_TIME_CLIENT, SUCCESSFUL_REQUEST_COUNT, SUCCESSFUL_REQUEST_COUNT_CLIENT, TOTAL_PROCESSING_TIME, WAIT_TIME
 # Possible METRICUNIT values: MICRO_SECOND, COUNT, PERCENT 
+# Possible DIMENSION_AGGREGATE: SUM, SINGLE_VALUE
 function createCalculatedTestMetric() {
     METRICKEY=$1
     METRICNAME=$2
     BASEMETRIC=$3
     METRICUNIT=$4
+    DIMENSION_AGGREGATE=$5
     PAYLOAD='{
         "tsmMetricKey": "'$METRICKEY'",
         "name": "'$METRICNAME'",
@@ -82,7 +84,7 @@ function createCalculatedTestMetric() {
             "placeholders": [],
             "topX": 10,
             "topXDirection": "DESCENDING",
-            "topXAggregation": "SUM"
+            "topXAggregation": "'$DIMENSION_AGGREGATE'"
         }
       }'
 
@@ -106,19 +108,19 @@ function createCalculatedTestMetric() {
 ###########################################################################
 # First we create Test Step Response Time
 ###########################################################################
-createCalculatedTestMetric "calc:service.teststepresponsetime" "Test Step Response Time" "RESPONSE_TIME" "MICRO_SECOND"
+createCalculatedTestMetric "calc:service.teststepresponsetime" "Test Step Response Time" "RESPONSE_TIME" "MICRO_SECOND" "SUM"
 
 ###########################################################################
 # Second we create Test Step Service Calls
 ###########################################################################
-createCalculatedTestMetric "calc:service.teststepservicecalls" "Test Step Service Calls" "NON_DATABASE_CHILD_CALL_COUNT" "COUNT"
+createCalculatedTestMetric "calc:service.teststepservicecalls" "Test Step Service Calls" "NON_DATABASE_CHILD_CALL_COUNT" "COUNT" "SINGLE_VALUE"
 
 ###########################################################################
 # Third we create Test Step Database Calls
 ###########################################################################
-createCalculatedTestMetric "calc:service.teststepdbcalls" "Test Step DB Calls" "DATABASE_CHILD_CALL_COUNT" "COUNT"
+createCalculatedTestMetric "calc:service.teststepdbcalls" "Test Step DB Calls" "DATABASE_CHILD_CALL_COUNT" "COUNT" "SINGLE_VALUE"
 
 ###########################################################################
 # Fourth we create Test Step Failurerate
 ###########################################################################
-createCalculatedTestMetric "calc:service.teststeperrorrate" "Test Step Failure Rate" "FAILURE_RATE" "PERCENT"
+createCalculatedTestMetric "calc:service.teststepfailurerate" "Test Step Failure Rate" "FAILURE_RATE" "PERCENT" "SINGLE_VALUE"

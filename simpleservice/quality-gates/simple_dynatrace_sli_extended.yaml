@@ -18,4 +18,4 @@ data:
     rt_test_invoke: "calc:service.teststepresponsetime:filter(eq(Test Name,invoke)):merge(0):avg?scope=tag(keptn_project:$PROJECT),tag(keptn_stage:$STAGE),tag(keptn_service:$SERVICE),tag(keptn_deployment:canary)"
     svccalls_test_invoke: "calc:service.teststepservicecalls:filter(eq(Test Name,invoke)):merge(0):avg?scope=tag(keptn_project:$PROJECT),tag(keptn_stage:$STAGE),tag(keptn_service:$SERVICE),tag(keptn_deployment:canary)"
     dbcalls_test_invoke: "calc:service.teststepdbcalls:filter(eq(Test Name,invoke)):merge(0):avg?scope=tag(keptn_project:$PROJECT),tag(keptn_stage:$STAGE),tag(keptn_service:$SERVICE),tag(keptn_deployment:canary)"
-    errorrate_test_invoke: "calc:service.teststeperrorrate:filter(eq(Test Name,invoke)):merge(0):avg?scope=tag(keptn_project:$PROJECT),tag(keptn_stage:$STAGE),tag(keptn_service:$SERVICE),tag(keptn_deployment:canary)"
+    failurerate_test_invoke: "calc:service.teststepfailurerate:filter(eq(Test Name,invoke)):merge(0):avg?scope=tag(keptn_project:$PROJECT),tag(keptn_stage:$STAGE),tag(keptn_service:$SERVICE),tag(keptn_deployment:canary)"
