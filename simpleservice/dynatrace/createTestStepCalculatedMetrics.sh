@@ -35,7 +35,7 @@ read -rsp $'Press ctrl-c to abort. Press any key to continue...\n' -n1 key
 # Example: createCalculatedTestMetric "calc:service.teststepresponsetime", "Test Step Response Time", "RESPONSE_TIME", "MICRO_SECOND", "CONTEXTLESS", "keptn_project", "simpleproject")
 # Full List of possible BASEMETRICS: CPU_TIME, DATABASE_CHILD_CALL_COUNT, DATABASE_CHILD_CALL_TIME, EXCEPTION_COUNT, FAILED_REQUEST_COUNT, FAILED_REQUEST_COUNT_CLIENT, FAILURE_RATE, FAILURE_RATE_CLIENT, HTTP_4XX_ERROR_COUNT, HTTP_4XX_ERROR_COUNT_CLIENT, HTTP_5XX_ERROR_COUNT, HTTP_5XX_ERROR_COUNT_CLIENT, IO_TIME, LOCK_TIME, NON_DATABASE_CHILD_CALL_COUNT, NON_DATABASE_CHILD_CALL_TIME, REQUEST_ATTRIBUTE, REQUEST_COUNT, RESPONSE_TIME, RESPONSE_TIME_CLIENT, SUCCESSFUL_REQUEST_COUNT, SUCCESSFUL_REQUEST_COUNT_CLIENT, TOTAL_PROCESSING_TIME, WAIT_TIME
 # Possible METRICUNIT values: MICRO_SECOND, COUNT, PERCENT 
-# Possible DIMENSION_AGGREGATE: SUM, SINGLE_VALUE
+# Possible DIMENSION_AGGREGATE: AVERAGE, COUNT, MAX, MIN, OF_INTEREST_RATIO, OTHER_RATIO, SINGLE_VALUE, SUM
 function createCalculatedTestMetric() {
     METRICKEY=$1
     METRICNAME=$2
@@ -123,4 +123,4 @@ createCalculatedTestMetric "calc:service.teststepdbcalls" "Test Step DB Calls" "
 ###########################################################################
 # Fourth we create Test Step Failurerate
 ###########################################################################
-createCalculatedTestMetric "calc:service.teststepfailurerate" "Test Step Failure Rate" "FAILURE_RATE" "PERCENT" "SINGLE_VALUE"
+createCalculatedTestMetric "calc:service.teststepfailurerate" "Test Step Failure Rate" "FAILURE_RATE" "PERCENT" "OF_INTEREST_RATIO"
