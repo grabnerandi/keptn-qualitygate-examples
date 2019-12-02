@@ -106,19 +106,19 @@ function createCalculatedTestMetric() {
 ###########################################################################
 # First we create Test Step Response Time
 ###########################################################################
-createCalculatedTestMetric "calc:service.teststepresponsetime", "Test Step Response Time", "RESPONSE_TIME", "MICRO_SECOND"
+createCalculatedTestMetric "calc:service.teststepresponsetime" "Test Step Response Time" "RESPONSE_TIME" "MICRO_SECOND"
 
 ###########################################################################
 # Second we create Test Step Service Calls
 ###########################################################################
-createCalculatedTestMetric "calc:service.teststepservicecalls", "Test Step Service Calls", "NON_DATABASE_CHILD_CALL_COUNT", "COUNT"
+createCalculatedTestMetric "calc:service.teststepservicecalls" "Test Step Service Calls" "NON_DATABASE_CHILD_CALL_COUNT" "COUNT"
 
 ###########################################################################
 # Third we create Test Step Database Calls
 ###########################################################################
-createCalculatedTestMetric "calc:service.teststepdbcalls", "Test Step DB Calls", "DATABASE_CHILD_CALL_COUNT", "COUNT"
+createCalculatedTestMetric "calc:service.teststepdbcalls" "Test Step DB Calls" "DATABASE_CHILD_CALL_COUNT" "COUNT"
 
 ###########################################################################
 # Fourth we create Test Step Failurerate
 ###########################################################################
-createCalculatedTestMetric "calc:service.teststeperrorrate", "Test Step Failure Rate", "FAILURE_RATE", "PERCENT"
+createCalculatedTestMetric "calc:service.teststeperrorrate" "Test Step Failure Rate" "FAILURE_RATE" "PERCENT"
