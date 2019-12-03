@@ -30,7 +30,7 @@ objectives:
   - sli: rt_test_invoke
   - sli: svccalls_test_invoke
   - sli: dbcalls_test_invoke
-  # - sli: failurerate_test_invoke
+  - sli: failurerate_test_invoke
   #  pass:
   #    - criteria:
   #        - "<=2%"
