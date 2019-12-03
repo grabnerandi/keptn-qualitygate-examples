@@ -15,6 +15,13 @@ objectives:
           - "<=800"
   - sli: throughput
   - sli: error_rate
+    weight: 2
+    pass:
+      - criteria:
+          - "<=1%"
+    warning:
+      - criteria:
+          - "<=2%"
   - sli: response_time_p50
   - sli: response_time_p90
 total_score:
