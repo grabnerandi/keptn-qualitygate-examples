@@ -19,7 +19,7 @@ CONDITION_VALUE=$3
 
 if [[ -z "$CONDITION_KEY" && -z "$CONDITION_VALUE" ]]; then
   echo "You have to at least specify a Tag Key or Value as a filter:"
-  echo "Usage: ./createTestStepCalculatedMetrics.sh CONTEXTLESS keptn-project simpleproject"
+  echo "Usage: ./createTestStepCalculatedMetrics.sh CONTEXTLESS keptn_project simpleproject"
   exit 1
 fi
 

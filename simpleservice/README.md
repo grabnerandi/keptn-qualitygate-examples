@@ -209,7 +209,7 @@ cd keptn
 ./enableDynatraceSLIForProject.sh simpleproject
 ```
 
-## 3.5 (Optional) Defining Custom SLIs for our Keptn Project
+## 3.6 (Optional) Defining Custom SLIs for our Keptn Project
 
 When we installed the Dynatrace SLI Data Source it came with a pre-configured set of 5 SLIs as [described here](https://github.com/keptn-contrib/dynatrace-sli-service/tree/release-0.1.0).
 We can define custom SLIs for each project so that you can base your SLOs on more than the 5 default SLIs that the default installation comes with
@@ -220,8 +220,7 @@ We can define custom SLIs for each project so that you can base your SLOs on mor
 kubectl apply -f sample_dynatrace_sli.yaml
 ```
 
-
-## 3.4 Run a new deployment
+## 3.7 Run a new deployment
 
 We are now ready and can run a new deployment
 
@@ -231,3 +230,4 @@ keptn send event new-artifact --project=simpleproject --service=simplenode --ima
 
 As the deployment runs you can watch the progress through the keptns bridge.
 Or you can see the events in Dynatrace as they got pushed by the Dynatrace keptn Service:
+
