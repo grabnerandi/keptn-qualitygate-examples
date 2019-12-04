@@ -61,7 +61,7 @@ function createCalculatedMetric() {
                 "attribute": "SERVICE_TAG",
                 "comparisonInfo": {
                     "type": "TAG",
-                    "comparison": "EQUALS",
+                    "comparison": "TAG_KEY_EQUALS",
                     "value": {
                         "context": "'$CONDITION_CONTEXT'",
                         "key": "'$CONDITION_KEY'",
