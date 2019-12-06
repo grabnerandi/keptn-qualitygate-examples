@@ -1,6 +1,6 @@
-# Setting up Sample Keptn 0.6beta Quality Gate Project for Services monitored with Dynatrace
+# Setting up Sample Keptn 0.6.0.beta2 Quality Gate Project for Services monitored with Dynatrace
 
-**Disclaimer:** this is for [keptn 0.6.beta](https://keptn.sh/docs/0.6.0/) "quality gates only" use case
+**Disclaimer:** this is for [keptn 0.6.0.beta2](https://keptn.sh/docs/0.6.0/) "quality gates only" use case
 
 This example walks you through 
 1. Installing keptn for the capabilty **Quality Gates only** on GKE
@@ -65,18 +65,18 @@ Hence you need Dynatrace that instruments the services you want to validate SLOs
 ## 1.1 Install Keptn Quality Gates on GKE
 
 Open your Linux shell where you are connected to your GKE cluster. You can validate it by executing kubectl get nodes (but I guess you knew that already) :-)
-First we download the keptn CLI (right now 0.6.0.beta) in our home directory!
+First we download the keptn CLI (right now 0.6.0.beta2) in our home directory!
 ```
-wget https://storage.googleapis.com/keptn-cli/0.6.0.beta/keptn-linux.tar.gz
-tar -xvf keptn-linux.tar.gz
-chmod +x keptn 
+wget https://github.com/keptn/keptn/releases/download/0.6.0.beta2/0.6.0.beta2_keptn-linux.tar.gz
+tar -xvf 0.6.0.beta2_keptn-linux.tar.gz
+chmod +x keptn
 mv keptn ~
-rm keptn-linux.tar.gz
+rm 0.6.0.beta2_keptn-linux.tar.gz
 ```
 
 Now lets install keptn with the quality gates use case only
 ```
-~/keptn install -p=kubernetes --keptn-version=0.6.0.beta --use-case=quality-gates --verbose
+~/keptn install -p=kubernetes --keptn-version=0.6.0.beta2 --use-case=quality-gates --verbose
 ```
 
 In that same shell lets start by cloning this repo and execute a script I prepared that exposes the keptn's bridge:
@@ -132,7 +132,7 @@ cd ../common
 ```
 
 ## 2.3 Adding our SLOs & SLIs
-**As of keptn 0.6 beta** the SLIs (Definition of Metrics & Queries) are stored as Config Map Entries. This will change for the final release as they will also be stored in the Git repo which makes it easier to change SLIs. Check out the sample_dynatrace_sli.yaml and the 5 SLIs I specified. You will notice the new Dynatrace Metrics API Query Langauge!
+**As of keptn 0.6.0 beta2** the SLIs (Definition of Metrics & Queries) are stored as Config Map Entries. This will change for the final release as they will also be stored in the Git repo which makes it easier to change SLIs. Check out the sample_dynatrace_sli.yaml and the 5 SLIs I specified. You will notice the new Dynatrace Metrics API Query Langauge!
 
 SLOs are already stored in Git for a specific project and stage. In our case we upload the sample_slo.yaml to our sampleservice in our sample project for the hardening stage! Check out the yaml file. You will see that I kept it simply. One SLI actually has conditions specified, the other ones are just "informational" which means the Quality Gate will pull the data but currently wont include it for the overall scoring. This has been a feature requested by many as you dont necessarily know from the start what your SLOs are for each indictor!
 
@@ -256,7 +256,7 @@ It will tell you the API Endpoint. To access the Swagger UI simply add /swagger-
 
 ## 5.1 Sending Start Evaluation Events
 
-Here is an example on how to execute a Start Evaluation Event (type=s.keptn.event.start-evaluation). 
+Here is an example on how to execute a Start Evaluation Event (type=sh.keptn.event.start-evaluation). 
 There are only a couple of items you need to pass in the data section:
 * start: defines the start timestamp of the evaluation timeframe
 * end: end timestamp of the evaluation timeframe

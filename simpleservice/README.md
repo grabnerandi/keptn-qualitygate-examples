@@ -86,17 +86,17 @@ aws eks --region eu-west-03 update-kubeconfig --name keptn06
 
 ## 1.3 Install Keptn
 
-First we download the keptn CLI (right now 0.6.0.beta)
+First we download the keptn CLI (right now 0.6.0.beta2)
 ```
-wget https://github.com/keptn/keptn/releases/download/0.6.0.beta/0.6.0.beta_keptn-linux.tar
-tar -xvf 0.6.0.beta_keptn-linux.tar
+wget https://github.com/keptn/keptn/releases/download/0.6.0.beta2/0.6.0.beta2_keptn-linux.tar.gz
+tar -xvf 0.6.0.beta2_keptn-linux.tar.gz
 chmod +x keptn
 sudo mv keptn /usr/local/bin/keptn
 ```
 
-Now we can install keptn. Via the --keptn-version flag we specify that we want 0.6.0.beta
+Now we can install keptn. Via the --keptn-version flag we specify that we want 0.6.0.beta2
 ```
-keptn install --platform=eks --keptn-version=release-0.6.0.beta
+keptn install --platform=eks --keptn-version=release-0.6.0.beta2
 ```
 Here is a sample output:
 ![](images/keptn_install_output.png)
@@ -106,7 +106,7 @@ As the output explains, keptn installs Istio and with that comes an Ingress Gate
 
 Now we configure keptn to be aware of this domain to correctly handle incoming requests on *.YOURKEPTNDOMAIN. Here is the call for my domain (make sure you use your Route53 domain):
 ```
-keptn configure domain keptn06-agrabner.demo.keptn.sh --keptn-version=release-0.6.0.beta
+keptn configure domain keptn06-agrabner.demo.keptn.sh --keptn-version=release-0.6.0.beta2
 ```
 At the end the output should say: CLI is authenticated against the Keptn cluster https://api.keptn.keptn06-agrabner.demo.keptn.sh
 
@@ -133,10 +133,10 @@ And you should have access to bridge (after confirming that you trust the SSL ce
 The Dynatrace Keptn Service pushes certain events (Deployment, Test, Evaluation ...) to Dynatrace to those monitored Dynatrace entities that are impacted by that event. In order for this to work the Dynatrace OneAgent must also be monitoring our EKS cluster. By following the instructions on the [Dynatrace Keptn Service](https://github.com/keptn-contrib/dynatrace-service/tree/release-0.4.0)
 ```
 cd ~
-git clone --branch 0.4.0 https://github.com/keptn-contrib/dynatrace-service --single-branch
+git clone --branch 0.5.0 https://github.com/keptn-contrib/dynatrace-service --single-branch
 cd dynatrace-service/deploy/scripts
 ./defineDynatraceCredentials.sh
-./deployDynatraceOnGKE.sh
+./deployDynatraceOnEKS.sh
 ```
 
 In a few seconds you should start seeing data in Dynatrace for your monitored EKS cluster. Navigate to your Hosts and click on the new entry.
@@ -150,6 +150,12 @@ The following script will re-use the Dynatrace Tenant URL and the API Token that
 cd ~/keptn-qualitygate-examples/simpleservice/keptn
 ./setupDynatraceSLIService.sh
 ```
+
+## 1.7 (Optional) Enable Notification Service for Slack, MSTeams ...
+
+Chat is another great option to get feedback about your deployments, test results and quality gates. In order to get Chat Notifications about things keptn orchestrates I am installing the keptn notification service as described here: https://github.com/keptn-contrib/notification-service/tree/develop#setup
+In my case I am using Slack. I have created a keptn06-eks channel and have installed the Incoming Web Hook App which gives me a Token I can use for the Notification Service. If you happen to have MS Teams and not Slack you can also configure the Notification Service to push events to MS Teams
+
 
 # 3. Configure Keptn to manage our Simpleservice
 
@@ -214,10 +220,10 @@ cd keptn
 When we installed the Dynatrace SLI Data Source it came with a pre-configured set of 5 SLIs as [described here](https://github.com/keptn-contrib/dynatrace-sli-service/tree/release-0.1.0).
 We can define custom SLIs for each project so that you can base your SLOs on more than the 5 default SLIs that the default installation comes with
 
-**As of keptn 0.6 beta** the SLIs (Definition of Metrics & Queries) are stored as Config Map Entries. This will change for the final release as they will also be stored in the Git repo which makes it easier to change SLIs. Check out the sample_dynatrace_sli.yaml and the 5 SLIs I specified. You will notice the new Dynatrace Metrics API Query Langauge!
+**As of keptn 0.6.0 beta2** the SLIs (Definition of Metrics & Queries) are stored as Config Map Entries. This will change for the final release as they will also be stored in the Git repo which makes it easier to change SLIs. Check out the sample_dynatrace_sli.yaml and the 5 SLIs I specified. You will notice the new Dynatrace Metrics API Query Langauge!
 
 ```
-kubectl apply -f sample_dynatrace_sli.yaml
+kubectl apply -f simple_dynatrace_sli.yaml
 ```
 
 ## 3.7 Run a new deployment
@@ -228,6 +234,71 @@ We are now ready and can run a new deployment
 keptn send event new-artifact --project=simpleproject --service=simplenode --image=docker.io/grabnerandi/simplenodeservice --tag=1.0.0
 ```
 
-As the deployment runs you can watch the progress through the keptns bridge.
-Or you can see the events in Dynatrace as they got pushed by the Dynatrace keptn Service:
+As the deployment runs you can watch the progress
+**a) through the keptns bridge**
+![](images/keptn_bridge_events.png)
+
+**b) through Chat notifications**
+These are coming in if you have installed the Notification Service
+![](images/slack_notifications.png)
+
+**c) through Dynatrace events**
+The Dynatrace Service has pushed events to those -Dynatrace Service entities that match the keptn_project, keptn_service, keptn_stage and keptn_deployment tags:
+![](images/dynatrace_events.png)
+
+
+## 3.9 Push a deplyoment through the API
+
+Besides using the Keptn CLI we can also call keptn through the REST API:
+
+Here is an example on how to notify keptn about a configuration change event (type=sh.keptn.event.configuration.change). 
+There are only a couple of items you need to pass in the data section:
+* project, service: this is your keptn project and the service you want to deploy with a new version
+* image: the new container image
+```
+{
+  "data": {
+    "canary": {
+      "action": "set",
+      "value": 100
+    },
+    "project": "simpleproject",
+    "service": "simplenode",
+    "stage": "",
+    "valuesCanary": {
+      "image": "docker.io/grabnerandi/simplenodeservice:3.0.0"
+    }
+  },
+  "type": "sh.keptn.event.configuration.change"
+}
+```
+
+And here is the corresponding curl where you can see how send a POST to the /event endpoint. The keptn token gets passed via the x-token header!
+```
+curl -X POST "http://api.keptn.12.34.56.78.xip.io/v1/event" -H "accept: application/json" -H "x-token: YOUR_KEPTN_TOKEN" -H "Content-Type: application/json" -d "{ \"data\": { \"end\": \"2019-11-21T11:10:00.000Z\", \"project\": \"sample\", \"service\": \"sampleservice\", \"stage\": \"hardening\", \"start\": \"2019-11-21T11:00:00.000Z\", \"teststrategy\": \"manual\" }, \"type\": \"sh.keptn.event.start-evaluation\"}"
+```
+
+What comes back is the keptn context that was created for you, here an example
+```
+{"keptnContext":"384dae76-2d31-41e6-9204-39f2c1513906","token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MDU0NDA4ODl9.OdkhIoJ9KuT4bm7imvEXHdEPjnU0pl5S7DqGibNa924"}
+```
+
+# 4. Additional Dynatrace Use Cases
+
+There are a couple of additional use cases we can enable
+
+## 4.1 Synthetic Tests against external URL
+
+For every service we deploy on k8s that exposes a URL through an Ingress we can create a Synthetic test that automatically validates SLAs for this service from different locations. 
+
+## 4.2 Dynatrace Dashboard
+
+In order to get an overview of your services in staging and production we can create a dashboard that shows us key metrics for our services per stage. 
+As dashboards can be created through the Dynatrace Dashboard API we can simple call the following script that creats this dashboard:
+```
+./dynatrace/createKeptnDashboard.sh
+```
+
+In Dynatrace you will now see the new Dashboard available that will look like this:
+![](images/dynatrace_keptn_dashboard.png)
 
