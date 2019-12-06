@@ -13,4 +13,4 @@ mv keptn ~
 rm keptn-linux.tar.gz
 
 # TODO: Validate Release Name
-~/keptn install -p=kubernetes --keptn-version=0.6.0.beta --use-case=quality-gates --verbose
+~/keptn install -p=kubernetes --keptn-version=0.6.0.beta2 --use-case=quality-gates --verbose
