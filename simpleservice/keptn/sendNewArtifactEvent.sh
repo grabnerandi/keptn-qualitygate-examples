@@ -2,7 +2,7 @@
 
 # Usage:
 # Assumes KEPTN_ENDPOINT and KEPTN_API_TOKEN are set
-# ./sendNewArtifactEvent.sh PROJECT SERVICE IMAGE
+# ./sendNewArtifactEvent.sh PROJECT SERVICE IMAGE [STAGE]
 
 if [[ -z "$KEPTN_ENDPOINT" || -z "$KEPTN_API_TOKEN" ]]; then
   echo "KEPTN_ENDPOINT & KEPTN_API_TOKEN MUST BE SET!!"
@@ -12,17 +12,18 @@ fi
 PROJECT=$1
 SERVICE=$2
 IMAGE=$3
+STAGE=$4
 
 if [[ -z "$PROJECT" || -z "$SERVICE" || -z "$IMAGE" ]]; then
   echo "You have to specify Project, Service & Image"
-  echo "Usage: ./sendNewArtifactEvent.sh simpleproject simplenode docker.io/grabnerandi/simplenodeservice:0.3.0"
+  echo "Usage: ./sendNewArtifactEvent.sh simpleproject simplenode docker.io/grabnerandi/simplenodeservice:3.0.0 [staging|prod]"
   exit 1
 fi
 
 PAYLOAD='{
   "type": "sh.keptn.event.configuration.change", 
   "specversion": "0.2", 
-  "source": "GitLab CI", 
+  "source": "Deployment Script", 
   "contenttype": "application/json", 
   "data": { 
     "canary": { 
@@ -30,7 +31,7 @@ PAYLOAD='{
       "value": 100 
     }, 
     "project": "'$PROJECT'", 
-    "stage": "", 
+    "stage": "'$STAGE'", 
     "service": "'$SERVICE'", 
     "valuesCanary": {
       "image": "'$IMAGE'" 
