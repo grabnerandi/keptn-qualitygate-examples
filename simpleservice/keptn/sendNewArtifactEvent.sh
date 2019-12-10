@@ -2,7 +2,7 @@
 
 # Usage:
 # Assumes KEPTN_ENDPOINT and KEPTN_API_TOKEN are set
-# ./sendNewArtifactEvent.sh PROJECT SERVICE IMAGE [STAGE]
+# ./sendNewArtifactEvent.sh PROJECT SERVICE IMAGE [GITCOMMIT] [STAGE]
 
 if [[ -z "$KEPTN_ENDPOINT" || -z "$KEPTN_API_TOKEN" ]]; then
   echo "KEPTN_ENDPOINT & KEPTN_API_TOKEN MUST BE SET!!"
@@ -12,11 +12,12 @@ fi
 PROJECT=$1
 SERVICE=$2
 IMAGE=$3
-STAGE=$4
+GITCOMMIT=$4
+STAGE=$5
 
 if [[ -z "$PROJECT" || -z "$SERVICE" || -z "$IMAGE" ]]; then
-  echo "You have to specify Project, Service & Image"
-  echo "Usage: ./sendNewArtifactEvent.sh simpleproject simplenode docker.io/grabnerandi/simplenodeservice:3.0.0 [staging|prod]"
+  echo "You have to specify Project, Service & Image and optionally a gitcommit and stage"
+  echo "Usage: ./sendNewArtifactEvent.sh simpleproject simplenode docker.io/grabnerandi/simplenodeservice:3.0.0 [gitcommit] [staging|prod]"
   exit 1
 fi
 
@@ -30,6 +31,9 @@ PAYLOAD='{
       "action": "set", 
       "value": 100 
     }, 
+    "labels" : {
+      "gitcommit" : "'$GITCOMMIT'"
+    },
     "project": "'$PROJECT'", 
     "stage": "'$STAGE'", 
     "service": "'$SERVICE'", 
