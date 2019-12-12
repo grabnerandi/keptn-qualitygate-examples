@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Usage:
-# ./createCalculatedMetrics.sh CONTEXTLESS keptn-project simpleproject
+# ./testCreateCustomCalculatedMetrics.sh CONTEXTLESS keptn-project simpleproject
 
 if [[ -z "$DT_TENANT" ]]; then
   DT_TENANT=$(cat ~/dynatrace-service/deploy/scripts/creds_dt.json | jq -r '.dynatraceTenant')
@@ -19,14 +19,14 @@ CONDITION_VALUE=$3
 
 if [[ -z "$CONDITION_KEY" && -z "$CONDITION_VALUE" ]]; then
   echo "You have to at least specify a Tag Key or Value as a filter:"
-  echo "Usage: ./createCalculatedMetrics.sh CONTEXTLESS keptn_project simpleproject"
+  echo "Usage: ./testCreateCustomCalculatedMetrics.sh CONTEXTLESS keptn_project simpleproject"
   exit 1
 fi
 
 echo "============================================================="
-echo "About to create 3 service metrics with condition [$1]$2:$3 on Dynatrace Tenant: $DT_TENANT!"
+echo "About to create one test sample metric [$1]$2:$3 on Dynatrace Tenant: $DT_TENANT!"
 echo "============================================================="
-echo "Usage: ./createCalculatedMetric CONTEXT KEY VALUE"
+echo "Usage: ./testCreateCustomCalculatedMetrics.sh CONTEXT KEY VALUE"
 read -rsp $'Press ctrl-c to abort. Press any key to continue...\n' -n1 key
 
 ####################################################################################################################
@@ -95,24 +95,5 @@ function createCalculatedMetric() {
     cat curloutput.txt
 }
 
-## Creates a Calculated Service Metrics "Top URL Response Time""
-## Metrics Id: calc:service.topurlresponsetime
-## Base Metric: Response Time (RESPONSE_TIME)
-## Dimension: URL
-## Condition: service tag [$TAG_CONTEXT]$TAG_KEY:TAG_VALUE
-createCalculatedMetric "calc:service.topurlresponsetime" "Top URL Response Time" "RESPONSE_TIME" "MICRO_SECOND" "$CONDITION_CONTEXT" "$CONDITION_KEY" "$CONDITION_VALUE" "URL" "{URL:Path}" "SUM"
-
-
-## Creates a Calculated Service Metrics "Top URL Service Calls"
-## Metrics Id: calc:service.topurlservicecalls
-## Base Metric: Number of calls to other services (NON_DATABASE_CHILD_CALL_COUNT)
-## Dimension: URL
-## Condition: service tag [$TAG_CONTEXT]$TAG_KEY:TAG_VALUE
-createCalculatedMetric "calc:service.topurlservicecalls" "Top URL Service Calls" "NON_DATABASE_CHILD_CALL_COUNT" "COUNT" "$CONDITION_CONTEXT" "$CONDITION_KEY" "$CONDITION_VALUE" "URL" "{URL:Path}" "SINGLE_VALUE"
-
-## Creates a Calculated Service Metrics "Top URL Service Calls"
-## Metrics Id: calc:service.topurlservicecalls
-## Base Metric: Number of calls to other services (NON_DATABASE_CHILD_CALL_COUNT)
-## Dimension: URL
-## Condition: service tag [$TAG_CONTEXT]$TAG_KEY:TAG_VALUE
-createCalculatedMetric "calc:service.topurldbcalls" "Top URL DB Calls" "DATABASE_CHILD_CALL_COUNT" "COUNT" "$CONDITION_CONTEXT" "$CONDITION_KEY" "$CONDITION_VALUE" "URL" "{URL:Path}" "SINGLE_VALUE"
+## Creates a Test Calculated Service Metrics "Test RT Metric by URL"
+createCalculatedMetric "calc:service.test" "Test RT Metric by URL" "RESPONSE_TIME" "MICRO_SECOND" "$CONDITION_CONTEXT" "$CONDITION_KEY" "$CONDITION_VALUE" "URL" "{URL:Path}" "SUM"

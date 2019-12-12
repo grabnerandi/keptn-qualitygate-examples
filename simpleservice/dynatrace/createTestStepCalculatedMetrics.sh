@@ -90,10 +90,10 @@ function createCalculatedTestMetric() {
 
   echo ""
   echo "Creating Metric $METRICNAME($METRICNAME)"
-  echo "PUT https://$DT_TENANT/api/config/v1/customMetric/service/$METRICKEY"
+  echo "PUT https://$DT_TENANT/api/config/v1/calculatedMetrics/service/$METRICKEY"
   echo "$PAYLOAD"
   curl -X PUT \
-          "https://$DT_TENANT/api/config/v1/customMetric/service/$METRICKEY" \
+          "https://$DT_TENANT/api/config/v1/calculatedMetrics/service/$METRICKEY" \
           -H 'accept: application/json; charset=utf-8' \
           -H "Authorization: Api-Token $DT_API_TOKEN" \
           -H 'Content-Type: application/json; charset=utf-8' \
