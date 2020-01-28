@@ -6,9 +6,9 @@ metadata:
   namespace: keptn
 spec:
   hosts:
-  - "bridge.keptn.DOMAIN_PLACEHOLDER"
+  - "bridge.keptn.keptn06-agrabner.demo.keptn.sh"
   gateways:
-  - keptn-gateway
+  - public-gateway.istio-system
   http:
     - route:
       - destination:

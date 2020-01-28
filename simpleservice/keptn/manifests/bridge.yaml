@@ -8,7 +8,7 @@ spec:
   hosts:
   - "bridge.keptn.DOMAIN_PLACEHOLDER"
   gateways:
-  - keptn-gateway
+  - public-gateway.istio-system
   http:
     - route:
       - destination:
