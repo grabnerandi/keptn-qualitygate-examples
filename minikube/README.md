@@ -87,7 +87,30 @@ As we now have Keptn running on Minikube we can go on with creating a project, o
 
 I will extend this tutorial with my own example but you can simply continue by following the steps as explained in the Keptn Docs: https://keptn.sh/docs/0.6.0/usecases/quality-gates/#configure-keptn-and-activate-the-quality-gate
 
-## 9: Restarting Minikube!
+# Quality Gate Result Visualization
+
+Here two screenshots showing the quality gate result visualization of the current early adopter Keptn'S Bridge. I ran it against my sample app where I let the quality gate pull in a couple of SLIs from Dynatrace and then evaluate them against my SLOs which leverage both static but also relative thresholds. Pretty slick :-)
+
+![](./evaluationresults_1.png)
+Image #1: Heatmap Visualization
+
+![](./evaluationresults_2.png)
+Image #2: Chart Visualization
+
+# Integration with your Delivery Pipelines
+
+The key use case of the Keptn Quality Gates standalone is to integrate it with your existing CI/CD pipeline tools such as Jenkins, ArgoCD, GitLab Pipelines, Azure DevOps, AWS CodePipeline, Harness, Tekton ...
+You can either call the Keptn CLI to kick off an evaluation after you have deployed your new artifacts and ran your builds or you can use the Keptn API to do the same.
+
+I will extend this tutorial with more details - but - check out what Christian Heckelmann has done for his GitLab Pipelines. He integrated Keptn Quality Gates and provides his scripts in his GitLab repo: 
+* GitLab Pipeline Sample Repo: https://gitlab.com/checkelmann/dynatrace-pipeline/-/tree/master
+* Keptn Evaluation Include: https://gitlab.com/checkelmann/dynatrace-pipeline/-/blob/master/ci-includes/keptn_evaluation.yaml
+
+![](./gitlabintegration.png)
+
+# Tips & Tricks
+
+## 1: Restarting Minikube!
 
 If you stop/start your Minikube it is likely that your Minikube node gets a different IP after each restart. If that is the case you won't be able to access the the API or Bridge anylonger under initial configured endpoints. Happened to me as well which is why I want to tell you how to update the configuration in case you get a new IP after a restart:
 1: Get the new internal cluster node IP
