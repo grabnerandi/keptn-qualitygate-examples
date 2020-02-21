@@ -1,0 +1,29 @@
+# Please edit the object below. Lines beginning with a '#' will be ignored,
+# and an empty file will abort the edit. If an error occurs while saving this file will be
+# reopened with the relevant failures.
+#
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: bridge-ingress
+  namespace: keptn
+spec:
+  rules:
+  - host: bridge.keptn.DOMAIN_PLACEHOLDER
+    http:
+      paths:
+      - backend:
+          serviceName: bridge
+          servicePort: 8080
+        path: /
+  - host: bridge.keptn
+    http:
+      paths:
+      - backend:
+          serviceName: bridge
+          servicePort: 8080
+        path: /
+  tls:
+  - hosts:
+    - DOMAIN_PLACEHOLDER
+    secretName: sslcerts
