@@ -1,6 +1,7 @@
 # Keptn Quality Gates on Minikube
 
 This is a step-by-step guide to install Keptn 0.6 Quality Gates on Minikube only needing 2vCPUs, 2GB RAM & 20GB Disk!
+The intention of this tutorial is to refine it and then bring it over to the Keptn Doc. So - I need your help and feedback to validate these steps also work on your machine. Thanks in advance!
 
 I have been running through this on my Windows 10 with HyperV enabled. It should work the same regardless of the OS and Hypervisor as long as Minikube supports it!
 
@@ -85,3 +86,24 @@ Here is how the bridge looks like - not much data in there yet because we dont y
 As we now have Keptn running on Minikube we can go on with creating a project, onboarding a service, uploading our SLIs & SLOs, configuring our SLI provider and then run our first evaluations ...
 
 I will extend this tutorial with my own example but you can simply continue by following the steps as explained in the Keptn Docs: https://keptn.sh/docs/0.6.0/usecases/quality-gates/#configure-keptn-and-activate-the-quality-gate
+
+## 9: Restarting Minikube!
+
+If you stop/start your Minikube it is likely that your Minikube node gets a different IP after each restart. If that is the case you won't be able to access the the API or Bridge anylonger under initial configured endpoints. Happened to me as well which is why I want to tell you how to update the configuration in case you get a new IP after a restart:
+1: Get the new internal cluster node IP
+```
+kubectl describe nodes
+```
+
+2: Edit both ingress configurations and fix the IP
+```
+kubectl edit ingress api-ingress -n keptn
+kubectl edit ingress bridge-ingress -n keptn
+```
+
+3: Update Keptn's domain info in its Config Map
+```
+kubectl edit cm keptn-domain -n keptn
+```
+
+Thats it! 
