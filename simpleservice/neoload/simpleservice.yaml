@@ -1,0 +1,94 @@
+name: Catalog_BasicCheck_neoload
+variables:
+- constant:
+    name: basicpath
+    value: CHECK_TO_REPLACE
+- constant:
+    name: tagurl
+    value: TAGURL_TO_REPLACE
+- constant:
+    name: server_host
+    value: HOST_TO_REPLACE
+- constant:
+    name: server_port
+    value: PORT_TO_REPLACE
+- random_number:
+    name: random_number_variable
+    min: 0
+    max: 999
+    predictable: false
+    change_policy: each_request
+servers:
+- name: simple_host
+  host: ${server_host}
+  port: ${server_port}
+user_paths:
+- name: SimpleCheck
+  actions:
+    steps:
+    - transaction:
+        name: Basic Check
+        steps:
+        - request:
+            url: /
+            server: simple_host
+            method: GET
+    - think_time: 250ms
+- name: SimpleLoad
+  actions:
+    steps:
+    - transaction:
+        name: Home Page
+        steps:
+        - request:
+            url: /
+            server: simple_host
+            method: GET
+    - think_time: 250ms
+    - transaction:
+        name: Version
+        steps:
+        - request:
+            url: /api/version
+            server: simple_host
+            method: GET
+    - think_time: 250ms
+    - transaction:
+        name: Echo
+        steps:
+        - request:
+            url: /api/echo?test="this a perf check ${random_number_variable}"
+            server: simple_host
+            method: GET
+    - think_time: 250ms
+    - transaction:
+        name: Invoke
+        steps:
+        - request:
+            url: /api/invoke?url="http://wwww.neotys.com"
+            server: simple_host
+            method: GET
+    - think_time: 250ms
+populations:
+- name: SimpleCheck
+  user_paths:
+  - name: SimpleCheck
+    distribution: 100%
+- name: Simpleload
+  user_paths:
+  - name: SimpleLoad
+    distribution: 100%
+scenarios:
+- name: SimpleCheck
+  populations:
+  - name: SimpleCheck
+    constant_load:
+      users: 1
+      duration: 15 iterations
+- name: Simpleload
+  populations:
+  - name: Simpleload
+    constant_load:
+      users: 30
+      duration: 2m
+      rampup: 30s

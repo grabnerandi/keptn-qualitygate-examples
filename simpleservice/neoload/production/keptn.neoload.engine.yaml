@@ -1,0 +1,22 @@
+steps:
+- step:
+    repository: https://github.com/keptn-orders/keptn-onboarding.git
+    branch: neoload
+    teststrategy: performance
+    project:
+    - path: /simpleservice/neoload/simpleservice.yaml
+    - path: /simpleservice/neoload/load_template/load_template.nlp
+    constant_variables:
+    - name: server_host
+      value: catalog.keptnorders-production.svc.cluster.local
+    - name: server_port
+      value: 80
+    description: Simpleload
+    scenario: Simpleload
+    infrastructure:
+      local_LG:
+      - name: lg1
+      populations:
+      - name: Simpleload
+        lgs:
+        - name: lg1

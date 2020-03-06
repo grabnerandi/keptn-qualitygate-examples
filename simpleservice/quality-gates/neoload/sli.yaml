@@ -1,0 +1,38 @@
+
+spec_version: '1.0'
+indicators:
+    hit_per_second:
+      metricType: GLOBAL
+      scope: AGGREGATED
+      statistics: ELEMENTS_PER_SECOND
+    avg_response_time:
+      metricType: GLOBAL
+      scope: AGGREGATED
+      statistics: AVG_DURATION
+    throughput:
+      metricType: GLOBAL
+      scope: AGGREGATED
+      statistics: DOWNLOADED_BYTES_PER_SECOND
+    additem_p95:
+      metricType: TRANSACTION
+      scope: AGGREGATED
+      statistics: P95
+      elementName: Echo
+    error_nl_rate:
+      metricType: GLOBAL
+      scope: AGGREGATED
+      statistics: FAILURE_RATE
+    basicCheck_p99:
+      metricType: TRANSACTION
+      scope: AGGREGATED
+      statistics: P99
+      elementName: Invoke
+    controllerCPU:
+      metricType: MONITORING
+      scope: AGGREGATED
+      statistics: AVG
+      elementName: Controller/CPU Load
+
+
+
+
