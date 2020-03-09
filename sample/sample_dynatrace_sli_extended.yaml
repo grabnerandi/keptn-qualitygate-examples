@@ -7,7 +7,7 @@ metadata:
   namespace: keptn
 data:
   custom-queries: |
-    throughput: "builtin:service.requestCount.total:merge(0):count?scope=tag($SERVICE-$STAGE)"
+    throughput: "builtin:service.requestCount.total:merge(0):sum?scope=tag($SERVICE-$STAGE)"
     error_rate: "builtin:service.errors.total.count:merge(0):avg?scope=tag($SERVICE-$STAGE)"
     response_time_p50: "builtin:service.response.time:merge(0):percentile(50)?scope=tag($SERVICE-$STAGE)"
     response_time_p90: "builtin:service.response.time:merge(0):percentile(90)?scope=tag($SERVICE-$STAGE)"
