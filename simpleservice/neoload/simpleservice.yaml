@@ -33,7 +33,7 @@ user_paths:
             url: /
             server: simple_host
             method: GET
-    - think_time: 250ms
+    - think_time: 500ms
 - name: SimpleLoad
   actions:
     steps:
@@ -44,7 +44,7 @@ user_paths:
             url: /
             server: simple_host
             method: GET
-    - think_time: 250ms
+    - think_time: 500ms
     - transaction:
         name: Version
         steps:
@@ -52,7 +52,7 @@ user_paths:
             url: /api/version
             server: simple_host
             method: GET
-    - think_time: 250ms
+    - think_time: 500ms
     - transaction:
         name: Echo
         steps:
@@ -60,7 +60,7 @@ user_paths:
             url: /api/echo?test="this a perf check ${random_number_variable}"
             server: simple_host
             method: GET
-    - think_time: 250ms
+    - think_time: 500ms
     - transaction:
         name: Invoke
         steps:
@@ -68,7 +68,7 @@ user_paths:
             url: /api/invoke?url="http://wwww.neotys.com"
             server: simple_host
             method: GET
-    - think_time: 250ms
+    - think_time: 500ms
 populations:
 - name: SimpleCheck
   user_paths:
@@ -89,6 +89,6 @@ scenarios:
   populations:
   - name: Simpleload
     constant_load:
-      users: 10
+      users: 5
       duration: 2m
       rampup: 30s
