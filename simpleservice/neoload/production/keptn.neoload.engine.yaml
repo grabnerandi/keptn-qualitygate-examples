@@ -8,7 +8,7 @@ steps:
     - path: /simpleservice/neoload/load_template/load_template.nlp
     constant_variables:
     - name: server_host
-      value: catalog.keptnorders-production.svc.cluster.local
+      value: simplenode.simpleproject-prod.35.195.181.244.xip.io
     - name: server_port
       value: 80
     description: Simpleload
