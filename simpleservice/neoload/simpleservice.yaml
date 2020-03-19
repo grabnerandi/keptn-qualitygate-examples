@@ -89,6 +89,6 @@ scenarios:
   populations:
   - name: Simpleload
     constant_load:
-      users: 2
+      users: 10
       duration: 2m
       rampup: 30s
