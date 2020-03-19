@@ -1,0 +1,43 @@
+# Instructions to run on an AWS Ubuntu Instance without using AWS load balancers.
+
+## Create an Ubuntu 18.04 t3.small 20GB HDD space
+ssh -i "C:\sshkeys\ag-key.pem" ubuntu@1.2.3.4
+
+sudo apt-get update
+cd ~
+curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
+chmod +x ./kubectl
+sudo mv ./kubectl /usr/local/bin/kubectl
+sudo apt-get install docker.io -y
+curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64 && chmod +x minikube && sudo mv minikube /usr/local/bin/
+minikube version
+wget https://github.com/keptn/keptn/releases/download/0.6.0/0.6.0_keptn-linux.tar
+tar -xf 0.6.0_keptn-linux.tar
+chmod +x keptn && sudo mv keptn /usr/local/bin/
+sudo -i
+minikube start --vm-driver=none
+sleep 30 # Wait for minikube to start
+kubectl get nodes
+keptn install --platform=kubernetes --use-case=quality-gates --gateway=NodePort --verbose
+# keptn status
+# Modify ingress rule to include route from public IP
+kubectl get ingress api-ingress -n keptn -o yaml > api-ingress.yaml
+# Expose EC2 Public IP
+sed -i "s/- host: api.keptn.$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4).xip.io/- host: api.keptn.$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4).xip.io/g" api-ingress.yaml
+sed -i "s/- $(curl -s http://169.254.169.254/latest/meta-data/local-ipv4).xip.io/- api.keptn.$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4).xip.io/g" api-ingress.yaml
+kubectl apply -f api-ingress.yaml
+# Expose Bridge
+wget https://raw.githubusercontent.com/grabnerandi/keptn-qualitygate-examples/master/minikube/bridge.yaml
+sed -i "s/- host: bridge.keptn.DOMAIN_PLACEHOLDER/- host: bridge.keptn.$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4).xip.io/g" bridge.yaml
+sed -i "s/- DOMAIN_PLACEHOLDER/- $(curl -s http://169.254.169.254/latest/meta-data/public-ipv4).xip.io/g" bridge.yaml
+kubectl apply -f bridge.yaml
+echo "Keptn Bridge URL: https://bridge.keptn.$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4).xip.io:$(kubectl get services -n ingress-nginx | cut -s -d ":" -f3 | cut -s -d "/" -f1)"
+# Update Bridge
+kubectl -n keptn set image deployment/bridge bridge=keptn/bridge2:0.6.1.EAP.20200221.1458 --record
+kubectl -n keptn-datastore set image deployment/mongodb-datastore mongodb-datastore=keptn/mongodb-datastore:0.6.1.EAP.20200131.1010 --record
+# Edit Config Map
+kubectl get cm keptn-domain -n keptn -o yaml > configmap.yaml
+sed -i "s/app_domain: $(curl -s http://169.254.169.254/latest/meta-data/local-ipv4).xip.io/app_domain: $(curl -s http://169.254.169.254/latest/meta-data/public-ipv4).xip.io/g" configmap.yaml
+kubectl apply -f configmap.yaml
+# Print Swagger URL
+echo "Swagger URL: https://api.keptn.$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4).xip.io:$(kubectl get services -n ingress-nginx | cut -s -d ":" -f3 | cut -s -d "/" -f1)/swagger-ui/"
