@@ -1,4 +1,4 @@
-# Keptn Quality Gates on EKS for Services Deployed w Keptn and Monitored w Dynatrace
+# Keptn Quality Gates on EKS for Services Deployed w Keptn, NeoLoad and Monitored w Dynatrace
 
 In this tutorial we will be 
 1. Install a new EKS cluster
@@ -199,28 +199,72 @@ In our new keptn project we can now create a new service.
 ```
 keptn onboard service simplenode --project=simpleproject --chart=./charts
 ```
+## 3.3 Remove the Jmeter service
+```   
+kubectl delete deployment jmeter-service-deployment-distributor -n keptn
+```   
 
-## 3.3 Adding JMeter Test Files 
-
-First we add our JMeter tests to both staging and prod
+## 3.4 Installing the NeoLoad Service
+The NeoLoad service will create the NeoLoad Kubernetes secret with the following settings
+* NeoLoad API toke,
+* NeoLoad Web Host ( by default : neoload.saas.neotys.com
+* NeoLoad API host ( by default : neoload-api.saas.neotys.com
+* NeoLoad Upload host ( by default : neoload-files.saas.neotys.com
+* NeoLoad Web zone id [how to create a neolaod zone](https://www.neotys.com/documents/doc/nlweb/latest/en/html/#27521.htm)
 
 ```
-keptn add-resource --project=simpleproject --service=simplenode --stage=staging --resource=jmeter/basiccheck.jmx --resourceUri=jmeter/basiccheck.jmx
-keptn add-resource --project=simpleproject --service=simplenode --stage=staging --resource=jmeter/load.jmx --resourceUri=jmeter/load.jmx
-keptn add-resource --project=simpleproject --service=simplenode --stage=prod --resource=jmeter/basiccheck.jmx --resourceUri=jmeter/basiccheck.jmx
-keptn add-resource --project=simpleproject --service=simplenode --stage=prod --resource=jmeter/load.jmx --resourceUri=jmeter/load.jmx
+cd ~
+git clone --branch 0.6.0 https://github.com/keptn-contrib/neoload-service --single-branch
+
+
+cd ~/neoload-service/installer/
+./defineNeoLoadWebCredentials.sh
+./deployNeoLoadWeb.sh
 ```
 
-## 3.4 Adding SLOs (Service Level Objectives)
+## 3.5 Install NeoLoad SLI service
+       
+```
+cd ~
+git clone --branch 0.6.0 https://github.com/keptn-contrib/neoload-sli-provider --single-branch
 
-We are adding the simple_dynatrace_slo.yaml which defines 5 objectives to each stage.
+cd ~/neoload-sli-provider/installer/
+./defineNeoLoadWebCredentials
+./deployNeoLoadWeb.sh
+```
+## 3.6 The NeoLoad testing assets ( keptn.neoload.engine.yaml)
+
+First we add our keptn.neoload.engine.yaml for each service,stage of the project
+
+```
+cd ~/keptn-qualitygate-examples/simpleservice/neoload
+cd /staging
+keptn add-resource --project=simpleproject --service=simplenode --stage=staging --resource=keptn.neoload.engine.yaml --resourceUri=keptn.neoload.engine.yaml
+cd /production
+keptn add-resource --project=simpleproject --service=simplenode --stage=prod --resource=keptn.neoload.engine.yaml --resourceUri=keptn.neoload.engine.yaml
+```
+## 3.7 Adding NeoLoad SLI (Service Level Indicators)
+
+```
+cd ~/keptn-qualitygate-examples/simpleservice/quality-gates/neoload
+keptn add-resource --project=simpleproject  --service=simplenode --stage=staging --resource=sli.yaml --resourceUri=neoload/sli.yaml
+keptn add-resource --project=simpleproject  --service=simplenode --stage=prod --resource=sli.yaml --resourceUri=neoload/sli.yaml
+```
+
+## 3.8 Enabling the NeoLoad SLI
+```
+cd cd ~/keptn-qualitygate-examples/simpleservice/keptn/gen
+kubectl apply -f lighthouse-source-neoload.yaml
+```
+## 3.9 Adding NeoLoad  (Service Level Objectives)
+
+We are adding the neoload simple_slo.yaml which defines 5 objectives to each stage.
 
 ```
 keptn add-resource --project=simpleproject --service=simplenode --stage=staging --resource=quality-gates/simple_slo.yaml --resourceUri=slo.yaml
 keptn add-resource --project=simpleproject --service=simplenode --stage=prod --resource=quality-gates/simple_slo.yaml --resourceUri=slo.yaml
 ```
-
-## 3.5 Enabling Dynatrace SLI Service for our project
+## 3.10 Enabling Dynatrace SLI Service for our project
 
 While we have installed the Dynatrace SLI Data Source for keptn we have to enable and configure it for each project. 
 The enableDynatraceSLIForProjects.sh actually does two things: 
@@ -233,7 +277,7 @@ cd keptn
 ./enableDynatraceSLIForProject.sh simpleproject
 ```
 
-## 3.6 (Optional) Defining Custom SLIs for our Keptn Project
+## 3.11 (Optional) Defining Custom SLIs for our Keptn Project
 
 When we installed the Dynatrace SLI Data Source it came with a pre-configured set of 5 SLIs as [described here](https://github.com/keptn-contrib/dynatrace-sli-service/tree/release-0.3.0).
 We can define custom SLIs for each project so that you can base your SLOs on more than the 5 default SLIs that the default installation comes with
@@ -243,6 +287,14 @@ We can define custom SLIs for each project so that you can base your SLOs on mor
 ```
 keptn add-resource --project=simpleproject --service=simplenode --stage=staging --resource=quality-gates/simple_dynatrace_sli.yaml --resourceUri=dynatrace/sli.yaml
 keptn add-resource --project=simpleproject --service=simplenode --stage=prod --resource=quality-gates/simple_dynatrace_sli.yaml --resourceUri=dynatrace/sli.yaml
+```
+## 3.12 Deploy the SLO
+
+
+```
+cd ~/keptn-qualitygate-examples/simpleservice/quality-gates/neoload
+keptn add-resource --project=simpleproject  --service=simplenode --stage=staging --resource=simple_slo.yaml --resourceUri=slo.yaml
+keptn add-resource --project=simpleproject  --service=simplenode --stage=prod --resource=simple_slo.yaml --resourceUri=slo.yaml
 ```
 
 ## 3.7 Run a new deployment
